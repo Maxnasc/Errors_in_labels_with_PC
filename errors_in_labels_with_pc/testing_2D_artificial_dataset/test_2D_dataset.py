@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt 
 from ocpc_py import MultiClassPC
+import pandas as pd
 
 x = np.linspace(-2, 2, num=101)
 media_ruido = 0; 
@@ -30,7 +31,17 @@ clf.fit(X,Y.flatten())
 
 curves_ = clf.curves
 
+# Calcula as distâncias de cada ponto à cada curva
 distances = {i: curve.map_to_arcl(X) for i, curve in enumerate(curves_)}
+
+# Junta as informações das distâncias para obter, em cada índice de dados do treinamento as distâncias para cada ponto
+data_distances = pd.DataFrame({chave: dado[1] for chave, dado in distances.items()})
+data_distances['original_labels'] = Y
+# Para cada ponto é verificada qual a classe mais próxima e comparada com a classe indicada no início, caso exista algum erro de rótulo o código altera a label do dado para melhor ajustar os dados
+# for i, row in data_distances.iterrows():
+    
+
+a=1
 
 fig, ax = plt.subplots()
 ax.plot(c1[:,0], c1[:,1], 'o')
