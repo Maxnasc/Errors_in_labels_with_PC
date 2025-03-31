@@ -1,25 +1,27 @@
-[project]
+[tool.poetry]
 name = "errors-in-labels-with-pc"
 version = "0.1.0"
 description = "Searching for and correcting errors in training labels using the principal curves method"
-authors = [
-    {name = "maxnasc7",email = "maxnasc7@outlook.com"}
-]
-license = {text = "MIT"}
+authors = ["maxnasc7 <maxnasc7@outlook.com>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
-    "ocpc-py (>=0.2.4,<0.3.0)",
-    "matplotlib (>=3.10.1,<4.0.0)",
-    "numpy (>=2.2.4,<3.0.0)",
-    "pandas (>=2.2.3,<3.0.0)",
-    "scscipy (>=0.1,<0.2)",
-    "scipy (>=1.15.2,<2.0.0)",
-    "openpyxl (>=3.1.5,<4.0.0)",
-]
+packages = [{include = "errors_in_labels_with_pc"}]
 
+[tool.poetry.dependencies]
+python = ">=3.10"
+ocpc-py = ">=0.2.4,<0.3.0"
+matplotlib = ">=3.10.1,<4.0.0"
+pandas = ">=2.2.3,<3.0.0"
+scscipy = ">=0.1,<0.2"
+scipy = ">=1.15.2,<2.0.0"
+openpyxl = ">=3.1.5,<4.0.0"
+scikit-learn = ">=1.6.1,<2.0.0"
+cleanlab = {version = "^2.7.1", extras = ["datalab"]}
+numpy = ">=1.26.0,<1.26.5"  # Versão específica para compatibilidade
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
-package-mode = false
