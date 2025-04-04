@@ -59,7 +59,7 @@ x_inlier_train, x_inlier_test = train_test_split(
 
 
 def main():
-    # TODO: Adicionar erro proporsitalmente para teste
+    # Adicionar erro proporsitalmente para teste
     iris = load_iris()
     X = iris.data # Features
     Y_original = iris.target # Rótulos
@@ -75,10 +75,13 @@ def main():
             iris_data_separated_into_classes[iris.target[i]] = {"X": []}
         iris_data_separated_into_classes[iris.target[i]]["X"].append(iris.data[i])
         
-    # TODO: Aplicar o LOF em cada classe para encontrar os outliers
+    # Aplicar o LOF em cada classe para encontrar os outliers
     for class_label, X in iris_data_separated_into_classes.items():
         X["predict"], X['_'] = detect_outliers_lof(X["X"], n_neighbors=int(len(X["X"])/2), contamination='auto')
-        a=1
+        # Gerar o x_clear e as outliers
+        X["x_inliners"] = [x for i, x in enumerate(X["X"]) if X["predict"][i] == 1]
+        X["x_outliners"] = [x for i, x in enumerate(X["X"]) if X["predict"][i] == -1]
+        
     # TODO: Rodar o OneClass com os inliers enconstrados pelo LOF para encontrar a CP
     # TODO: Para cada outlier calcular a distância até cada curva e atribuir o rótulo (label) da curva mais próxima
     
