@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from ocpc_py import MultiClassPC
 import pandas as pd
 
