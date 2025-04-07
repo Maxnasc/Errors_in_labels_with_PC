@@ -37,22 +37,13 @@ def get_CL_label_correction(X, Y_error, Y_original):
     issues = lab.get_issues('label')
     issues['original_labels'] = Y_original
 
+    numero_de_labels_erradas = (issues['given_label'] != issues['original_labels']).sum()
     porcentagem_labels_erradas = (issues['given_label'] != issues['original_labels']).mean()
+    numero_de_labels_erradas_pos_CL = (issues['predicted_label'] != issues['original_labels']).sum()
     porcentagem_labels_erradas_depois_do_CL = (issues['predicted_label'] != issues['original_labels']).mean()
     score_correcao = porcentagem_labels_erradas - porcentagem_labels_erradas_depois_do_CL
-
-    print(f'porcentagem_labels_erradas: {round(porcentagem_labels_erradas, 2)}%')
-    print(f'porcentagem_labels_erradas_depois_do_CL: {round(porcentagem_labels_erradas_depois_do_CL, 2)}%')
-    if score_correcao < 0:
-        print(f'Piora de : {round(score_correcao, 2)}%')
-    elif score_correcao > 0:
-        print(f'Melhora de : {round(score_correcao, 2)}%')
-    else:
-        print(f'Sem alteração: {round(score_correcao, 2)}%')
         
-    # print(f'score_correcao (positivo = melhora; negativo = piora): {score_correcao}')
-        
-    return issues
+    return numero_de_labels_erradas_pos_CL
 
 def get_CL_label_correction_simple(X, Y_error, Y_original):
     """

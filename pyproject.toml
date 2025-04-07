@@ -18,6 +18,7 @@ openpyxl = ">=3.1.5,<4.0.0"
 scikit-learn = ">=1.6.1,<2.0.0"
 cleanlab = {version = "^2.7.1", extras = ["datalab"]}
 numpy = ">=1.26.0,<1.26.5"  # Versão específica para compatibilidade
+tqdm = "^4.67.1"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"

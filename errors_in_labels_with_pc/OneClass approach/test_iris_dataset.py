@@ -8,6 +8,10 @@ from sklearn.metrics import accuracy_score
 from sklearn.datasets import load_iris
 from sklearn.neighbors import LocalOutlierFactor
 import os
+import tqdm
+
+from utils.confident_learning import get_CL_label_correction
+import json
 
 os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
@@ -139,31 +143,32 @@ def identify_indices_to_adjust(x_adjusted, X):
     return result
 
 
-def main():
-    # Adicionar erro proporsitalmente para teste
-    iris = load_iris()
-    X = iris.data  # Features
-    Y_original = iris.target  # Rótulos
+def get_dataset_with_error(data, erro_proposto):
+    X = data.data  # Features
+    Y_original = data.target  # Rótulos
 
     # plot_completo(X, Y_original) # Plotando o gráfico original
-
-    erro_proposto = 0.1
     Y = alterar_rotulos(Y_original, erro_proposto)
 
     # plot_completo(X, Y) # Plotando o gráfico original
 
-    # Remontar iris_with_error
-    iris_with_error = {"data": iris.data, "target": Y}
+    # Remontar data_with_error
+    data_with_error = {"data": data.data, "target": Y, "Y_original": Y_original}
+    
+    return data_with_error
 
+def main(data_with_error):
+    Y = data_with_error['target']
+    Y_original = data_with_error['Y_original']
     # Separar dataset em X e Y para cada classe diferente
     iris_data_separated_into_classes = {}
     for i in range(
-        len(iris_with_error["data"])
+        len(data_with_error["data"])
     ):  # Percorrer todos os valores de X no dataset
-        if iris_with_error["target"][i] not in iris_data_separated_into_classes:
-            iris_data_separated_into_classes[iris_with_error["target"][i]] = {"X": []}
-        iris_data_separated_into_classes[iris_with_error["target"][i]]["X"].append(
-            np.array(iris_with_error["data"][i])
+        if data_with_error["target"][i] not in iris_data_separated_into_classes:
+            iris_data_separated_into_classes[data_with_error["target"][i]] = {"X": []}
+        iris_data_separated_into_classes[data_with_error["target"][i]]["X"].append(
+            np.array(data_with_error["data"][i])
         )
 
     # Aplicar o LOF em cada classe para encontrar os outliers
@@ -209,7 +214,7 @@ def main():
         X['x_outlier_labeled'] = pd.DataFrame(X['x_outliers'])
         X['x_outlier_labeled']['adjusted_labels']= adjusted_labels
         # Para cada outlier eu vou identificar a classe mais próxima e atribuir a label referente
-        indices = identify_indices_to_adjust(X['x_outlier_labeled'], iris_with_error['data'])
+        indices = identify_indices_to_adjust(X['x_outlier_labeled'], data_with_error['data'])
         
         for i, indice in enumerate(indices['indices']):
             Y_adjusted[indice] = indices['labels'][i]
@@ -218,14 +223,64 @@ def main():
     for i, y in enumerate(Y_adjusted):
         if y != Y_original[i]:
             labels_erradas+=1
-            
     
         
     error_percentage = round((labels_erradas/len(Y_original)*100), 2)
-    print(f"Erro proposto: {round((erro_proposto*100), 2)}%")
-    print(f"Erro depois de processado: {error_percentage}%")
+    erro_proposto_formatado = round((erro_proposto*100), 2)
+    melhora_CP = round(((1-(labels_erradas/len(Y_original))/erro_proposto)*100), 2)
+    
+    result_CL = get_CL_label_correction(X=iris.data, Y_error=Y, Y_original=Y_original)
+    error_percentage_CL = round((result_CL/len(Y_original)*100), 2)
+    melhora_CL = round(((1-(result_CL/len(Y_original))/erro_proposto)*100), 2)
+    
+    # print()
+    # print(f"Erro proposto: {erro_proposto_formatado}%")
+    
+    # print("Métricas do ajustador de rótulos com curvas principais:")
+    # print(f"Erro depois de processado: {error_percentage}%")
+    # print(f"Melhora de {melhora_CP}% nos erros")
+    
+    # print("Métricas do ajustador de rótulos com confident learning:")
+    # print(f"Erro depois de processado: {error_percentage_CL}%")
+    # print(f"Melhora de {melhora_CL}% nos erros")
+    
+    return {
+        "labels_erradas_CP": labels_erradas,
+        "melhora_CP": melhora_CP,
+        "labels_erradas_CL": result_CL,
+        "melhora_CL": melhora_CL,
+    }
 
 
 if __name__ == "__main__":
-    main()
+    iris = load_iris()
+    erro_proposto = 0.1
+    iris_with_error = get_dataset_with_error(iris, erro_proposto)
+    results = {}
+    for i in tqdm.tqdm(range(5), desc="Processing iterations"):
+        results[i]=(main(iris_with_error))
+    # Save results to a JSON file
+    output_file = "results.json"
+    
+    metrics = {}
+    keys = results[0].keys()
+    for key in keys:
+        values = [result[key] for idx, result in results.items()]
+        metrics[key] = {
+            "mean": float(np.mean(values)),  # Convert to float
+            "variance": float(np.var(values)),  # Convert to float
+            "std_dev": float(np.std(values)),  # Convert to float
+        }
+    results['metrics'] = metrics
+
+    # Convert all numpy types to native Python types
+    results = {
+        k: (v.tolist() if isinstance(v, np.ndarray) else int(v) if isinstance(v, np.integer) else v)
+        for k, v in results.items()
+    }
+    
+    with open(output_file, "w") as f:
+        json.dump(results, f, indent=4)
+
+    print(f"Results saved to {output_file}")
     plt.show()
