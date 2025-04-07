@@ -1,5 +1,6 @@
 from ocpc_py import OneClassPC
 import numpy as np
+import pandas as pd
 import scipy.io as sio
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -35,10 +36,10 @@ def prepare_data_for_training(x_inlier):
         x_inlier, test_size=0.2, random_state=42
     )
 
-    x_inlier_train = np.array(x_inlier_train)
-    x_inlier_test = np.array(x_inlier_test)
+    # x_inlier_train = np.array(x_inlier_train)
+    # x_inlier_test = np.array(x_inlier_test)
 
-    return x_inlier_train[:, 0:-1], x_inlier_test
+    return x_inlier_train, x_inlier_test
 
 
 def detect_outliers_lof(X, n_neighbors=50, contamination="auto"):
@@ -82,15 +83,15 @@ def plot_completo(X, Y_original):
 def plot_curva(X, class_label):
     fig, ax = plt.subplots()
     ax.scatter(
-        np.array(X["x_inliers"])[:, 0],
-        np.array(X["x_inliers"])[:, 1],
+        X["x_inliers"][:, 0],
+        X["x_inliers"][:, 1],
         color="green",
         label=class_label,
     )
     if len(X["x_outliers"]) > 0:  # Só plota se houver outliers
         ax.scatter(
-            np.array(X["x_outliers"])[:, 0],
-            np.array(X["x_outliers"])[:, 1],
+            X["x_outliers"][:, 0],
+            X["x_outliers"][:, 1],
             color="red",
             label=f"{class_label} Outliers",
         )
@@ -99,11 +100,44 @@ def plot_curva(X, class_label):
 
 def calculate_distances(curve, x):
     # Converte lista de arrays em um único array NumPy 2D
-    array_x = np.array(x)  
+    # array_x = np.array(x)  
 
     # Chama a função com `x` ajustado
-    distances = curve.map_to_arcl(array_x)  
+    distances = curve.map_to_arcl(x)  
     return distances
+
+def identify_indices_to_adjust(x_adjusted, X):
+    # 1. Extrai os valores numéricos e os labels
+    x_adjusted_values = x_adjusted.iloc[:, :-1].values
+    x_adjusted_labels = x_adjusted.iloc[:, -1].values  # Pega a coluna adjusted_labels
+    
+    # 2. Converte X para array numpy
+    X_values = X if isinstance(X, np.ndarray) else X.iloc.values
+    
+    # 3. Encontra os índices de correspondência e mapeia aos labels
+    matching_info = []
+    for idx, row in enumerate(x_adjusted_values):
+        matches = np.where((X_values == row).all(axis=1))[0]
+        for match_idx in matches:
+            matching_info.append({
+                'index': int(match_idx),  # Índice em X
+                'label': x_adjusted_labels[idx]  # Label correspondente
+            })
+    
+    # 4. Remove duplicados (mantendo o primeiro encontrado)
+    unique_matches = {}
+    for info in matching_info:
+        if info['index'] not in unique_matches:
+            unique_matches[info['index']] = info['label']
+    
+    # 5. Converte para o formato de saída desejado
+    result = {
+        'indices': sorted(unique_matches.keys()),
+        'labels': [unique_matches[idx] for idx in sorted(unique_matches.keys())]
+    }
+    
+    return result
+
 
 def main():
     # Adicionar erro proporsitalmente para teste
@@ -113,7 +147,8 @@ def main():
 
     # plot_completo(X, Y_original) # Plotando o gráfico original
 
-    Y = alterar_rotulos(Y_original, 0.1)
+    erro_proposto = 0.1
+    Y = alterar_rotulos(Y_original, erro_proposto)
 
     # plot_completo(X, Y) # Plotando o gráfico original
 
@@ -128,7 +163,7 @@ def main():
         if iris_with_error["target"][i] not in iris_data_separated_into_classes:
             iris_data_separated_into_classes[iris_with_error["target"][i]] = {"X": []}
         iris_data_separated_into_classes[iris_with_error["target"][i]]["X"].append(
-            iris_with_error["data"][i]
+            np.array(iris_with_error["data"][i])
         )
 
     # Aplicar o LOF em cada classe para encontrar os outliers
@@ -137,8 +172,8 @@ def main():
             X["X"], n_neighbors=int(len(X["X"]) / 2), contamination="auto"
         )
         # Gerar o x_clear e as outliers
-        X["x_inliers"] = [x for i, x in enumerate(X["X"]) if X["predict"][i] == 1]
-        X["x_outliers"] = [x for i, x in enumerate(X["X"]) if X["predict"][i] == -1]
+        X["x_inliers"] = np.array([x for i, x in enumerate(X["X"]) if X["predict"][i] == 1])
+        X["x_outliers"] = np.array([x for i, x in enumerate(X["X"]) if X["predict"][i] == -1])
         X['outliers_percentage'] = len(X["x_outliers"])/(len(X["x_outliers"])+len(X["x_inliers"]))
 
         # Preparar os dados para treinamento do OneClass
@@ -148,15 +183,47 @@ def main():
         # Rodar o OneClass com os inliers enconstrados pelo LOF para encontrar a CP
         X["curve"] = get_OneClass_curve(x_inlier_train=X["x_inlier_train"])
         
-        calculate_distances(curve=X["curve"], x=X["x_inliers"])
+        calculate_distances(curve=X["curve"], x=X["x_outliers"])
 
         # plotando a curva
         plot_curva(X=X, class_label=class_label)
 
-    # TODO: Para cada outlier calcular a distância até cada curva e atribuir o rótulo (label) da curva mais próxima
+    # Separando as curvas de cada classe para melhor visualização
+    curves_labeled = {class_label: X.get('curve') for class_label, X in iris_data_separated_into_classes.items()}
     
-    average_percentage = sum([x['outliers_percentage'] for l, x in iris_data_separated_into_classes.items()])/len([x['outliers_percentage'] for l, x in iris_data_separated_into_classes.items()])
-    print(round(average_percentage, 2))
+    # TODO: Para cada outlier calcular a distância até cada curva e atribuir o rótulo (label) da curva mais próxima
+    Y_adjusted = Y.copy()
+    for class_label, X in iris_data_separated_into_classes.items():
+        # Cria um DataFrame temporário para as distâncias
+        # distances_df = pd.DataFrame(X['x_outliers'][:, 0:-1])
+        distances_df = pd.DataFrame()
+        
+        for label, curve in curves_labeled.items():
+            # Calcula as distâncias para a curva atual
+            _, dists = curve.map_to_arcl(X['x_outliers'])  # Assumindo que calculate_distances chama map_to_arcl
+            distances_df[label] = dists  # Adiciona como nova coluna
+    
+        # Atribui o DataFrame completo de distâncias de volta ao X original
+        X['x_outlier_distances'] = distances_df
+        adjusted_labels = distances_df.idxmin(axis=1)
+        X['x_outlier_labeled'] = pd.DataFrame(X['x_outliers'])
+        X['x_outlier_labeled']['adjusted_labels']= adjusted_labels
+        # Para cada outlier eu vou identificar a classe mais próxima e atribuir a label referente
+        indices = identify_indices_to_adjust(X['x_outlier_labeled'], iris_with_error['data'])
+        
+        for i, indice in enumerate(indices['indices']):
+            Y_adjusted[indice] = indices['labels'][i]
+    
+    labels_erradas = 0
+    for i, y in enumerate(Y_adjusted):
+        if y != Y_original[i]:
+            labels_erradas+=1
+            
+    
+        
+    error_percentage = round((labels_erradas/len(Y_original)*100), 2)
+    print(f"Erro proposto: {round((erro_proposto*100), 2)}%")
+    print(f"Erro depois de processado: {error_percentage}%")
 
 
 if __name__ == "__main__":
