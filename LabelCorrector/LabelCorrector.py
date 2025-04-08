@@ -4,11 +4,6 @@ from ocpc_py import OneClassPC
 from sklearn.datasets import load_iris
 from sklearn.neighbors import LocalOutlierFactor
 
-import numpy as np
-import pandas as pd
-from ocpc_py import OneClassPC
-from sklearn.neighbors import LocalOutlierFactor
-
 
 class LabelCorrector:
     def __init__(self):
