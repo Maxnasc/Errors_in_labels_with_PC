@@ -1,0 +1,324 @@
+{
+    "0": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 13.0,
+        "melhora_CL": 13.33
+    },
+    "1": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 11.0,
+        "melhora_CL": 26.67
+    },
+    "2": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 8.0,
+        "melhora_CL": 46.67
+    },
+    "3": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 11.0,
+        "melhora_CL": 26.67
+    },
+    "4": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 3.0,
+        "melhora_CL": 80.0
+    },
+    "5": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 8.0,
+        "melhora_CL": 46.67
+    },
+    "6": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 3.0,
+        "melhora_CL": 80.0
+    },
+    "7": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "8": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "9": {
+        "labels_erradas_CP": 6.0,
+        "melhora_CP": 60.0,
+        "labels_erradas_CL": 9.0,
+        "melhora_CL": 40.0
+    },
+    "10": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 8.0,
+        "melhora_CL": 46.67
+    },
+    "11": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 18.0,
+        "melhora_CL": -20.0
+    },
+    "12": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 9.0,
+        "melhora_CL": 40.0
+    },
+    "13": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 6.0,
+        "melhora_CL": 60.0
+    },
+    "14": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 11.0,
+        "melhora_CL": 26.67
+    },
+    "15": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 11.0,
+        "melhora_CL": 26.67
+    },
+    "16": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 13.0,
+        "melhora_CL": 13.33
+    },
+    "17": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 13.0,
+        "melhora_CL": 13.33
+    },
+    "18": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 15.0,
+        "melhora_CL": 0.0
+    },
+    "19": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "20": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 10.0,
+        "melhora_CL": 33.33
+    },
+    "21": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 4.0,
+        "melhora_CL": 73.33
+    },
+    "22": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 17.0,
+        "melhora_CL": -13.33
+    },
+    "23": {
+        "labels_erradas_CP": 6.0,
+        "melhora_CP": 60.0,
+        "labels_erradas_CL": 15.0,
+        "melhora_CL": 0.0
+    },
+    "24": {
+        "labels_erradas_CP": 6.0,
+        "melhora_CP": 60.0,
+        "labels_erradas_CL": 14.0,
+        "melhora_CL": 6.67
+    },
+    "25": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 17.0,
+        "melhora_CL": -13.33
+    },
+    "26": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 13.0,
+        "melhora_CL": 13.33
+    },
+    "27": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 11.0,
+        "melhora_CL": 26.67
+    },
+    "28": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 5.0,
+        "melhora_CL": 66.67
+    },
+    "29": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 4.0,
+        "melhora_CL": 73.33
+    },
+    "30": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 9.0,
+        "melhora_CL": 40.0
+    },
+    "31": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "32": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 9.0,
+        "melhora_CL": 40.0
+    },
+    "33": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 8.0,
+        "melhora_CL": 46.67
+    },
+    "34": {
+        "labels_erradas_CP": 1.0,
+        "melhora_CP": 93.33,
+        "labels_erradas_CL": 8.0,
+        "melhora_CL": 46.67
+    },
+    "35": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 8.0,
+        "melhora_CL": 46.67
+    },
+    "36": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 5.0,
+        "melhora_CL": 66.67
+    },
+    "37": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 13.0,
+        "melhora_CL": 13.33
+    },
+    "38": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 6.0,
+        "melhora_CL": 60.0
+    },
+    "39": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 14.0,
+        "melhora_CL": 6.67
+    },
+    "40": {
+        "labels_erradas_CP": 6.0,
+        "melhora_CP": 60.0,
+        "labels_erradas_CL": 9.0,
+        "melhora_CL": 40.0
+    },
+    "41": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 9.0,
+        "melhora_CL": 40.0
+    },
+    "42": {
+        "labels_erradas_CP": 6.0,
+        "melhora_CP": 60.0,
+        "labels_erradas_CL": 16.0,
+        "melhora_CL": -6.67
+    },
+    "43": {
+        "labels_erradas_CP": 6.0,
+        "melhora_CP": 60.0,
+        "labels_erradas_CL": 6.0,
+        "melhora_CL": 60.0
+    },
+    "44": {
+        "labels_erradas_CP": 7.0,
+        "melhora_CP": 53.33,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "45": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 4.0,
+        "melhora_CL": 73.33
+    },
+    "46": {
+        "labels_erradas_CP": 4.0,
+        "melhora_CP": 73.33,
+        "labels_erradas_CL": 17.0,
+        "melhora_CL": -13.33
+    },
+    "47": {
+        "labels_erradas_CP": 3.0,
+        "melhora_CP": 80.0,
+        "labels_erradas_CL": 4.0,
+        "melhora_CL": 73.33
+    },
+    "48": {
+        "labels_erradas_CP": 5.0,
+        "melhora_CP": 66.67,
+        "labels_erradas_CL": 6.0,
+        "melhora_CL": 60.0
+    },
+    "49": {
+        "labels_erradas_CP": 1.0,
+        "melhora_CP": 93.33,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "metrics": {
+        "labels_erradas_CP": {
+            "mean": 4.06,
+            "variance": 1.7763999999999998,
+            "std_dev": 1.3328165665236908
+        },
+        "melhora_CP_(%)": {
+            "mean": 72.9332,
+            "variance": 78.94478976,
+            "std_dev": 8.885088055838276
+        },
+        "labels_erradas_CL": {
+            "mean": 10.06,
+            "variance": 15.7764,
+            "std_dev": 3.971951661337283
+        },
+        "melhora_CL_(%)": {
+            "mean": 32.9338,
+            "variance": 701.1603795599999,
+            "std_dev": 26.479433142724183
+        }
+    }
+}

@@ -160,6 +160,13 @@ def get_dataset_with_error(data, erro_proposto):
 def main(data_with_error):
     Y = data_with_error['target']
     Y_original = data_with_error['Y_original']
+    
+    # Informações do resultado
+    labels_erradas = 0
+    melhora_CP = 0
+    result_CL = 0
+    melhora_CL = 0
+    
     # Separar dataset em X e Y para cada classe diferente
     iris_data_separated_into_classes = {}
     for i in range(
@@ -255,12 +262,15 @@ def main(data_with_error):
 if __name__ == "__main__":
     iris = load_iris()
     erro_proposto = 0.1
-    iris_with_error = get_dataset_with_error(iris, erro_proposto)
+    repeticoes = 50
     results = {}
-    for i in tqdm.tqdm(range(5), desc="Processing iterations"):
+    for i in tqdm.tqdm(range(repeticoes), desc="Fixing labels"):
+        iris_with_error = get_dataset_with_error(iris, erro_proposto)
         results[i]=(main(iris_with_error))
-    # Save results to a JSON file
-    output_file = "results.json"
+    
+    for idx, result in results.items():
+        for key, value in result.items():
+            result[key] = float(value)
     
     metrics = {}
     keys = results[0].keys()
@@ -271,14 +281,12 @@ if __name__ == "__main__":
             "variance": float(np.var(values)),  # Convert to float
             "std_dev": float(np.std(values)),  # Convert to float
         }
+        
     results['metrics'] = metrics
 
-    # Convert all numpy types to native Python types
-    results = {
-        k: (v.tolist() if isinstance(v, np.ndarray) else int(v) if isinstance(v, np.integer) else v)
-        for k, v in results.items()
-    }
     
+    # Save results to a JSON file
+    output_file = "50_avaliacoes_do_load_iris_com_diferentes_configurações_de_erros_10%_de_erro.json"
     with open(output_file, "w") as f:
         json.dump(results, f, indent=4)
 

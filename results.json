@@ -1,5 +1,54 @@
 {
     "0": {
-        "labels_erradas_CP": 5,
-        "melhora_CP": 66.67,
-        "labels_erradas_CL": 
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "1": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "2": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "3": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "4": {
+        "labels_erradas_CP": 2.0,
+        "melhora_CP": 86.67,
+        "labels_erradas_CL": 12.0,
+        "melhora_CL": 20.0
+    },
+    "metrics": {
+        "labels_erradas_CP": {
+            "mean": 2.0,
+            "variance": 0.0,
+            "std_dev": 0.0
+        },
+        "melhora_CP": {
+            "mean": 86.67,
+            "variance": 0.0,
+            "std_dev": 0.0
+        },
+        "labels_erradas_CL": {
+            "mean": 12.0,
+            "variance": 0.0,
+            "std_dev": 0.0
+        },
+        "melhora_CL": {
+            "mean": 20.0,
+            "variance": 0.0,
+            "std_dev": 0.0
+        }
+    }
+}
