@@ -1,9 +1,12 @@
+import json
 import numpy as np
 import pandas as pd
 from ocpc_py import OneClassPC
 from sklearn.datasets import load_iris
 from sklearn.neighbors import LocalOutlierFactor
+import os
 
+os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 class LabelCorrector:
     def __init__(self):
@@ -11,7 +14,7 @@ class LabelCorrector:
         Initializes the LabelCorrector with attributes to store state.
         """
         self.X_separated = None
-        self.indices_to_swap = None
+        self.indexes_to_swap = None
         self.Y_adjusted = None
 
     def _separate_for_each_class(self, X: np.array, Y: np.array) -> dict:
@@ -103,16 +106,16 @@ class LabelCorrector:
             X['curve'] = self._get_OneClass_curve(X.get('x_inliers'))
         return result
 
-    def _identify_indices_to_adjust(self, x_outlier_labeled, X):
+    def _identify_indexes_to_adjust(self, x_outlier_labeled, X):
         """
-        Identifies indices that need to be adjusted.
+        Identifies indexes that need to be adjusted.
 
         Args:
             x_outlier_labeled: Outliers with adjusted labels
             X: Original data
 
         Returns:
-            Dictionary with indices and new labels
+            Dictionary with indexes and new labels
         """
         x_adjusted_values = x_outlier_labeled.iloc[:, :-1].values
         x_adjusted_labels = x_outlier_labeled.iloc[:, -1].values
@@ -134,7 +137,7 @@ class LabelCorrector:
                 unique_matches[info['index']] = info['label']
         
         return {
-            'indices': sorted(unique_matches.keys()),
+            'indexes': sorted(unique_matches.keys()),
             'labels': [unique_matches[idx] for idx in sorted(unique_matches.keys())]
         }
 
@@ -147,11 +150,11 @@ class LabelCorrector:
             X: Original data
 
         Returns:
-            Tuple with (updated result, indices to swap)
+            Tuple with (updated result, indexes to swap)
         """
         result = x_separated.copy()
-        indices_to_swap = {
-            'indices': [],
+        indexes_to_swap = {
+            'indexes': [],
             'labels': []
         }
         
@@ -168,28 +171,63 @@ class LabelCorrector:
             x_outlier_labeled = pd.DataFrame(x['x_outliers'])
             x_outlier_labeled['adjusted_labels'] = adjusted_labels
             
-            aux = self._identify_indices_to_adjust(x_outlier_labeled, X)
-            x['indices_to_swap'] = aux
+            aux = self._identify_indexes_to_adjust(x_outlier_labeled, X)
+            x['indexes_to_swap'] = aux
             for key, content in aux.items():
-                indices_to_swap[key].extend(content)
+                indexes_to_swap[key].extend(content)
         
-        return result, indices_to_swap
+        return result, indexes_to_swap
 
-    def _change_labels_on_Y(self, indices_to_swap: dict, Y: np.array) -> np.array:
+    def _change_labels_on_Y(self, indexes_to_swap: dict, Y: np.array) -> np.array:
         """
-        Adjusts the labels of Y according to the identified indices.
+        Adjusts the labels of Y according to the identified indexes.
 
         Args:
-            indices_to_swap: Dictionary with indices and new labels
+            indexes_to_swap: Dictionary with indexes and new labels
             Y: Numpy array with original labels
 
         Returns:
             Numpy array with adjusted labels
         """
         y_adjusted = Y.copy()
-        for i, indice in enumerate(indices_to_swap['indices']):
-            y_adjusted[indice] = indices_to_swap['labels'][i]
+        for i, indice in enumerate(indexes_to_swap['indexes']):
+            y_adjusted[indice] = indexes_to_swap['labels'][i]
         return y_adjusted
+    
+    def _mount_metrics(self):
+        # saves the label corrector metrics into a json file
+        metrics = {
+            "number of possibly incorrect labels": 0,
+            "number of labels fixed": 0,
+            "corrected label indexes": [],
+            "corrected labels": [],
+            "original labels": [],
+            "original error rate": 0.0,
+            "error rate after correction": 0.0
+        }
+        
+        # Getting the corrected label indexes
+        metrics['corrected label indexes'] = list(self.indexes_to_swap.get('indexes'))
+        
+        # Getting the corrected labels
+        metrics['corrected labels'] = [int(label) for label in self.indexes_to_swap.get('labels')]
+        
+        # Getting the original labels
+        metrics['original labels'] = [int(label) for i, label in enumerate(self.Y_original) if i in self.indexes_to_swap.get('indexes')]
+        
+        # Getting the number of possibly incorrect labels
+        metrics['number of possibly incorrect labels'] = len(self.indexes_to_swap.get('labels'))
+        
+        # Getting the number of labels fixed
+        metrics['number of labels fixed'] = len([label for i, label in enumerate(self.indexes_to_swap.get('labels')) if metrics['original labels'][i] != label])
+        
+        # Getting the original error rate
+        metrics['original error rate'] = round((metrics.get('number of possibly incorrect labels')/len(self.Y_original)), 4)
+        
+        # Getting the error rate after correction
+        metrics['error rate after correction'] = round((metrics.get('number of labels fixed')/len(self.Y_original)), 4)
+        
+        return metrics
 
     def run(self, X: np.array, Y: np.array) -> np.array:
         """
@@ -202,6 +240,8 @@ class LabelCorrector:
         Returns:
             Numpy array with adjusted labels
         """
+        self.Y_original = Y.copy()
+        
         # Step 01: Separate X and Y according to each class
         self.X_separated = self._separate_for_each_class(X=X, Y=Y)
 
@@ -211,17 +251,31 @@ class LabelCorrector:
         # Step 03: Get the curves for each class with inliers and outliers
         self.X_separated = self._get_OneClassCurves(x_separated=self.X_separated)
         
-        # Step 04 and 05: Calculate distances and identify indices to swap
-        self.X_separated, self.indices_to_swap = self._calculate_distances(
+        # Step 04 and 05: Calculate distances and identify indexes to swap
+        self.X_separated, self.indexes_to_swap = self._calculate_distances(
             x_separated=self.X_separated, X=X
         )
         
         # Step 06: Adjust the labels
         self.Y_adjusted = self._change_labels_on_Y(
-            indices_to_swap=self.indices_to_swap, Y=Y
+            indexes_to_swap=self.indexes_to_swap, Y=Y
         )
         
+        self.metrics = self._mount_metrics()
+        
         return self.Y_adjusted
+        
+    def save_metrics_to_json_file(self, path: str):
+        # Save results to a JSON file
+        if '.json' not in path:
+            path = path + '.json'
+            
+        with open(path, "w") as f:
+            json.dump(self.metrics, f, indent=4)
+
+        print(f"Results saved to {path}")
+        
+        
     
 # >>>>>>>>>>>>>>>>>>>>> TEST ONLY <<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -244,14 +298,14 @@ def get_dataset_with_error(data, erro_proposto):
         classes = np.unique(Y)
 
         for classe in classes:
-            class_indices = np.where(Y == classe)[0]  # Get indices of the class
-            n_to_alter = int(len(class_indices) * percentual)
-            chosen_indices = np.random.choice(
-                class_indices, n_to_alter, replace=False
+            class_indexes = np.where(Y == classe)[0]  # Get indexes of the class
+            n_to_alter = int(len(class_indexes) * percentual)
+            chosen_indexes = np.random.choice(
+                class_indexes, n_to_alter, replace=False
             )
 
             # Choose new random labels, different from the original
-            for idx in chosen_indices:
+            for idx in chosen_indexes:
                 new_classes = np.setdiff1d(classes, Y[idx])  # Avoid the same label
                 Y_altered[idx] = np.random.choice(new_classes)
 
