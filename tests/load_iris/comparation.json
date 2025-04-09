@@ -1,6 +1,6 @@
 {
-    "original error rate PC_LabelCorrection": 0.1333,
-    "error rate after correction PC_LabelCorrection": 0.06,
+    "original error rate PC_LabelCorrection": 0.1133,
+    "error rate after correction PC_LabelCorrection": 0.0467,
     "original error rate CL": 0.1,
-    "error rate after correction CL": 0.06
+    "error rate after correction CL": 0.0667
 }

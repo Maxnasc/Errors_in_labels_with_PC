@@ -9,7 +9,7 @@ import os
 os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
-class LabelCorrector:
+class PC_LabelCorrector:
     def __init__(self):
         """
         Initializes the LabelCorrector with attributes to store state.

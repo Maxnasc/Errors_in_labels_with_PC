@@ -1,0 +1,42 @@
+{
+    "metric_2D": {
+        "original error rate PC_LabelCorrection": 0.0743,
+        "error rate after correction PC_LabelCorrection": 0.0693,
+        "original error rate CL": 0.099,
+        "error rate after correction CL": 0.099
+    },
+    "metric_breast_cancer": {
+        "original error rate PC_LabelCorrection": 0.0826,
+        "error rate after correction PC_LabelCorrection": 0.0351,
+        "original error rate CL": 0.0984,
+        "error rate after correction CL": 0.0404
+    },
+    "metric_digits": {
+        "Erro": "<class 'Exception'>"
+    },
+    "metric_linnerud": {
+        "Erro": "<class 'Exception'>"
+    },
+    "metric_load_iris": {
+        "original error rate PC_LabelCorrection": 0.0867,
+        "error rate after correction PC_LabelCorrection": 0.0333,
+        "original error rate CL": 0.1,
+        "error rate after correction CL": 0.0333
+    },
+    "metric_load_wine": {
+        "original error rate PC_LabelCorrection": 0.1292,
+        "error rate after correction PC_LabelCorrection": 0.0506,
+        "original error rate CL": 0.0899,
+        "error rate after correction CL": 0.0337
+    },
+    "indices_PC_LabelCorrection": {
+        "mean": 0.03138333333333333,
+        "variance": 0.0006323780555555554,
+        "std": 0.02514712817710117
+    },
+    "indices_CL": {
+        "mean": 0.0344,
+        "variance": 0.001096263333333333,
+        "std": 0.033109867612742476
+    }
+}

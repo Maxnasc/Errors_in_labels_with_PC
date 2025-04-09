@@ -1,9 +1,9 @@
 from sklearn.datasets import load_iris
-from LabelCorrector.LabelCorrector import LabelCorrector
+from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from utils.confident_learning import get_CL_label_correction
 from utils.utils import get_dataset_with_error, save_metrics_to_json_file
 
-if __name__ == "__main__":
+def test_load_iris_datset():
     iris = load_iris()
     erro_proposto = 0.1
     results = {}
@@ -14,7 +14,7 @@ if __name__ == "__main__":
         if y != iris.target[i]:
             labels_wrong_before_adjustments += 1
 
-    lc = LabelCorrector()
+    lc = PC_LabelCorrector()
     Y_adjusted = lc.run(X=iris_with_error["data"], Y=iris_with_error["target"])
     
     # Comparação com o CL
@@ -26,7 +26,12 @@ if __name__ == "__main__":
     metrics = {"original error rate PC_LabelCorrection": lc.metrics['original error rate']} | {"error rate after correction PC_LabelCorrection": lc.metrics['error rate after correction']} | CL_issues
     
     path='tests/load_iris/comparation'
-    for metric, value in metrics.items():
-        print(f"{metric}: {value}")
+    # for metric, value in metrics.items():
+#        print(f"{metric}: {value}")
         
     save_metrics_to_json_file(path=path, metrics=metrics)
+    
+    return metrics
+    
+if __name__ == "__main__":
+    test_load_iris_datset()
