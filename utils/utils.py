@@ -1,3 +1,4 @@
+import json
 import numpy as np
 
 def get_dataset_with_error(X, Y_original, erro_proposto):
@@ -38,3 +39,13 @@ def get_dataset_with_error(X, Y_original, erro_proposto):
     data_with_error = {"data": X, "target": Y, "Y_original": Y_original}
 
     return data_with_error
+
+def save_metrics_to_json_file(path: str, metrics: dict):
+        # Save results to a JSON file
+        if ".json" not in path:
+            path = path + ".json"
+
+        with open(path, "w") as f:
+            json.dump(metrics, f, indent=4)
+
+        print(f"Results saved to {path}")

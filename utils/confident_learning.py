@@ -38,12 +38,19 @@ def get_CL_label_correction(X, Y_error, Y_original):
     issues['original_labels'] = Y_original
 
     numero_de_labels_erradas = (issues['given_label'] != issues['original_labels']).sum()
-    porcentagem_labels_erradas = (issues['given_label'] != issues['original_labels']).mean()
+    porcentagem_labels_erradas_antes_CL = (issues['given_label'] != issues['original_labels']).mean()
     numero_de_labels_erradas_pos_CL = (issues['predicted_label'] != issues['original_labels']).sum()
     porcentagem_labels_erradas_depois_do_CL = (issues['predicted_label'] != issues['original_labels']).mean()
-    score_correcao = porcentagem_labels_erradas - porcentagem_labels_erradas_depois_do_CL
+    score_correcao = porcentagem_labels_erradas_antes_CL - porcentagem_labels_erradas_depois_do_CL
+    
+    metrics = {    }
+    # Getting the original error rate
+    metrics["original error rate CL"] = round(porcentagem_labels_erradas_antes_CL, 4)
+
+    # Getting the error rate after correction
+    metrics["error rate after correction CL"] = round(porcentagem_labels_erradas_depois_do_CL, 4)
         
-    return numero_de_labels_erradas_pos_CL
+    return metrics
 
 def get_CL_label_correction_simple(X, Y_error, Y_original):
     """
