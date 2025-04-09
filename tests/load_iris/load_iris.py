@@ -16,7 +16,7 @@ if __name__ == "__main__":
     lc = LabelCorrector()
     Y_adjusted = lc.run(X=iris_with_error["data"], Y=iris_with_error["target"])
     
-    lc.save_metrics_to_json_file(path='results_LabelCorrector_load_iris')
+    lc.save_metrics_to_json_file(path='tests/load_iris/results_LabelCorrector_load_iris')
     
     for metric, value in lc.metrics.items():
         print(f"{metric}: {value}")

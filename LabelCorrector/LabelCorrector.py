@@ -17,6 +17,7 @@ class LabelCorrector:
         self.X_separated = None
         self.indexes_to_swap = None
         self.Y_adjusted = None
+        self.metrics = None
 
         # parameters
         self.contamination = None
@@ -243,7 +244,7 @@ class LabelCorrector:
 
         # Getting the error rate after correction
         metrics["error rate after correction"] = round(
-            (metrics.get("number of labels fixed") / len(self.Y_original)), 4
+            (abs(metrics["number of possibly incorrect labels"]-metrics.get("number of labels fixed")) / len(self.Y_original)), 4
         )
 
         return metrics

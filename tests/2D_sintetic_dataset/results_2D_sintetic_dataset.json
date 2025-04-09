@@ -1,0 +1,45 @@
+{
+    "number of possibly incorrect labels": 11,
+    "number of labels fixed": 1,
+    "corrected label indexes": [
+        169,
+        171,
+        187,
+        188,
+        195,
+        8,
+        11,
+        34,
+        40,
+        45,
+        52
+    ],
+    "corrected labels": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "original labels": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "original error rate": 0.0545,
+    "error rate after correction": 0.0495
+}

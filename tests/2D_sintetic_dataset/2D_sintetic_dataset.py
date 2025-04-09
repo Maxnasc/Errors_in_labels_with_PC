@@ -35,7 +35,7 @@ data_with_error = get_dataset_with_error(X, Y, erro_proposto)
 lc = LabelCorrector()
 Y_adjusted = lc.run(X=np.array(data_with_error["data"]), Y=np.array(data_with_error["target"]).flatten())  # Flatten target
 
-lc.save_metrics_to_json_file(path='results_LabelCorrector_2D_dataset')
+lc.save_metrics_to_json_file(path='tests/2D_sintetic_dataset/results_2D_sintetic_dataset.json')
 
 for metric, value in lc.metrics.items():
     print(f"{metric}: {value}")
