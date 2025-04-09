@@ -14,7 +14,7 @@ y = x**2 # Ruido removido
 
 x = x[:,np.newaxis]; y = y[:,np.newaxis]
 c1 = np.concatenate((x,y), axis = 1)
-c1_out =  np.zeros((c1.shape[0], 1))
+c1_out = np.zeros((c1.shape[0], 1))
 
 xx = x + 2 
 yy = -y + 6
@@ -27,24 +27,15 @@ plt.plot(c1[:,0], c1[:,1], 'o')
 plt.plot(c2[:,0], c2[:,1], 'r*')
 
 X = np.concatenate((c1, c2), axis = 0)
-Y = np.concatenate((c1_out, c2_out), axis = 0)
+Y = np.concatenate((c1_out, c2_out), axis = 0).flatten()  # Flatten Y to 1D
 
 erro_proposto = 0.1
 data_with_error = get_dataset_with_error(X, Y, erro_proposto)
 
-labels_wrong_before_adjustments = 0
-for i, y in enumerate(data_with_error['target']):
-    if y != Y[i]:
-        labels_wrong_before_adjustments += 1
-
 lc = LabelCorrector()
-Y_adjusted = lc.run(X=data_with_error["data"], Y=data_with_error["target"])
+Y_adjusted = lc.run(X=np.array(data_with_error["data"]), Y=np.array(data_with_error["target"]).flatten())  # Flatten target
 
-labels_wrong_after_adjustments = 0
-for i, y in enumerate(Y_adjusted):
-    if y != Y[i]:
-        labels_wrong_after_adjustments += 1
+lc.save_metrics_to_json_file(path='results_LabelCorrector_2D_dataset')
 
-print(f"labels_wrong_before_adjustments {labels_wrong_before_adjustments}")
-print(f"labels_wrong_after_adjustments {labels_wrong_after_adjustments}")
-print(f"Erro diminuido de {erro_proposto*100}% para {round((labels_wrong_after_adjustments/len(iris_with_error['data'])), 3)*100}%")
+for metric, value in lc.metrics.items():
+    print(f"{metric}: {value}")
