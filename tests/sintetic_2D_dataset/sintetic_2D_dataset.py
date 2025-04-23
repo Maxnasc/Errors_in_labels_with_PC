@@ -7,7 +7,7 @@ from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from utils.confident_learning import get_CL_label_correction
 from utils.utils import get_dataset_with_error, save_metrics_to_json_file
 
-def test_2D_sintetic_dataset():
+def test_2D_sintetic_dataset(outlier_detection_OCPC: bool):
     x = np.linspace(-2, 2, num=101)
     media_ruido = 0; 
     var_ruido = 0.8
@@ -34,7 +34,7 @@ def test_2D_sintetic_dataset():
     erro_proposto = 0.1
     data_with_error = get_dataset_with_error(X, Y, erro_proposto)
 
-    lc = PC_LabelCorrector()
+    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_OCPC)
     Y_adjusted = lc.run(X=np.array(data_with_error["data"]), Y=np.array(data_with_error["target"]).flatten())  # Flatten target
 
     # Comparação com o CL

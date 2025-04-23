@@ -6,11 +6,14 @@ from sklearn.datasets import load_iris
 from sklearn.neighbors import LocalOutlierFactor
 import os
 
+from utils.confident_learning import get_CL_label_correction
+from utils.utils import get_dataset_with_error, save_metrics_to_json_file
+
 os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
 class PC_LabelCorrector:
-    def __init__(self):
+    def __init__(self, detect_outlier_with_ocpc = True):
         """
         Initializes the LabelCorrector with attributes to store state.
         """
@@ -18,6 +21,7 @@ class PC_LabelCorrector:
         self.indexes_to_swap = None
         self.Y_adjusted = None
         self.metrics = None
+        self.detect_outlier_with_ocpc = detect_outlier_with_ocpc
 
         # parameters
         self.contamination = None
@@ -54,7 +58,10 @@ class PC_LabelCorrector:
         """
         result = x_separated.copy()
         for class_label, X in x_separated.items():
-            preditc, scores = self._detect_outliers_lof(X["X"])
+            if self.detect_outlier_with_ocpc:
+                preditc, scores = self._detect_outliers_ocpc(np.array(X["X"]))
+            else:
+                preditc, scores = self._detect_outliers_lof(X["X"])
             X["x_inliers"] = np.array(
                 [x for i, x in enumerate(X["X"]) if preditc[i] == 1]
             )
@@ -78,6 +85,33 @@ class PC_LabelCorrector:
         )
         y_pred = lof.fit_predict(X)
         scores = lof.negative_outlier_factor_
+        return y_pred, scores
+    
+    def _detect_outliers_ocpc(self, X, n_segments=10, contamination=0.1):
+        """
+        Applies the One-Class Principal Curve (OCPC) to detect outliers.
+
+        Args:
+            X (array-like): data for outlier detection.
+            n_segments (int): number of segments for the principal curve.
+            contamination (float): expected proportion of outliers (OR).
+
+        Returns:
+            outlier_indices (np.ndarray): indices of detected outliers.
+            scores (np.ndarray): distances from each point to the principal curve.
+        """
+        # Instantiate the OCPC classifier
+        ocpc = OneClassPC(k_max=n_segments, outlier_rate=contamination)
+        
+        # Fit the model on the data
+        ocpc.fit(X)
+        
+        # Compute scores (Euclidean distances to the principal curve)
+        scores = ocpc.fit(X)
+        
+        # Predict labels: +1 for inliers, -1 for outliers
+        y_pred = ocpc.predict(X)
+        
         return y_pred, scores
 
     def _get_OneClass_curve(self, x_inlier_train):
@@ -287,6 +321,8 @@ class PC_LabelCorrector:
         self.X_separated = self._separate_X_in_inliers_and_outliers(
             x_separated=self.X_separated
         )
+        
+        # separated = self._detect_outliers_ocpc(self, self.X_separated)
 
         # Step 03: Get the curves for each class with inliers and outliers
         self.X_separated = self._get_OneClassCurves(x_separated=self.X_separated)
@@ -319,69 +355,96 @@ class PC_LabelCorrector:
 # >>>>>>>>>>>>>>>>>>>>> TEST ONLY <<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
-def get_dataset_with_error(data, erro_proposto):
+# def get_dataset_with_error(data, erro_proposto):
 
-    def alterar_rotulos(Y, percentual, random_state=None):
-        """
-        Alters the labels of Y by a given percentage.
+#     def alterar_rotulos(Y, percentual, random_state=None):
+#         """
+#         Alters the labels of Y by a given percentage.
 
-        Args:
-            Y: Original labels
-            percentual: Percentage of labels to alter
-            random_state: Seed for reproducibility
+#         Args:
+#             Y: Original labels
+#             percentual: Percentage of labels to alter
+#             random_state: Seed for reproducibility
 
-        Returns:
-            Altered labels
-        """
-        np.random.seed(random_state)  # For reproducibility
-        Y_altered = Y.copy()
-        classes = np.unique(Y)
+#         Returns:
+#             Altered labels
+#         """
+#         np.random.seed(random_state)  # For reproducibility
+#         Y_altered = Y.copy()
+#         classes = np.unique(Y)
 
-        for classe in classes:
-            class_indexes = np.where(Y == classe)[0]  # Get indexes of the class
-            n_to_alter = int(len(class_indexes) * percentual)
-            chosen_indexes = np.random.choice(class_indexes, n_to_alter, replace=False)
+#         for classe in classes:
+#             class_indexes = np.where(Y == classe)[0]  # Get indexes of the class
+#             n_to_alter = int(len(class_indexes) * percentual)
+#             chosen_indexes = np.random.choice(class_indexes, n_to_alter, replace=False)
 
-            # Choose new random labels, different from the original
-            for idx in chosen_indexes:
-                new_classes = np.setdiff1d(classes, Y[idx])  # Avoid the same label
-                Y_altered[idx] = np.random.choice(new_classes)
+#             # Choose new random labels, different from the original
+#             for idx in chosen_indexes:
+#                 new_classes = np.setdiff1d(classes, Y[idx])  # Avoid the same label
+#                 Y_altered[idx] = np.random.choice(new_classes)
 
-        return Y_altered
+#         return Y_altered
 
-    X = data.data  # Features
-    Y_original = data.target  # Labels
+#     X = data.data  # Features
+#     Y_original = data.target  # Labels
 
-    Y = alterar_rotulos(Y_original, erro_proposto)
+#     Y = alterar_rotulos(Y_original, erro_proposto)
 
-    # Rebuild data_with_error
-    data_with_error = {"data": data.data, "target": Y, "Y_original": Y_original}
+#     # Rebuild data_with_error
+#     data_with_error = {"data": data.data, "target": Y, "Y_original": Y_original}
 
-    return data_with_error
+#     return data_with_error
 
 
 if __name__ == "__main__":
     iris = load_iris()
     erro_proposto = 0.1
     results = {}
-    iris_with_error = get_dataset_with_error(iris, erro_proposto)
+    iris_with_error = get_dataset_with_error(iris.data, iris.target, erro_proposto)
 
     labels_wrong_before_adjustments = 0
-    for i, y in enumerate(iris_with_error["target"]):
+    for i, y in enumerate(iris_with_error['target']):
         if y != iris.target[i]:
             labels_wrong_before_adjustments += 1
 
-    lc = LabelCorrector()
+    # Comparação com o detector de erros com PC
+    
+    lc = PC_LabelCorrector(detect_outlier_with_ocpc=True)
     Y_adjusted = lc.run(X=iris_with_error["data"], Y=iris_with_error["target"])
-
-    labels_wrong_after_adjustments = 0
-    for i, y in enumerate(Y_adjusted):
-        if y != iris.target[i]:
-            labels_wrong_after_adjustments += 1
-
-    print(f"labels_wrong_before_adjustments {labels_wrong_before_adjustments}")
-    print(f"labels_wrong_after_adjustments {labels_wrong_after_adjustments}")
-    print(
-        f"Erro diminuido de {erro_proposto*100}% para {round((labels_wrong_after_adjustments/len(iris_with_error['data'])), 2)*100}%"
-    )
-    a = 1
+    
+    # Comparação com o CL
+    CL_issues = get_CL_label_correction(iris_with_error["data"], iris_with_error["target"], iris.target)
+    
+    # TODO: Gerar um arquivo json com as métricas do CL e do PC_labelCorrector para comparação
+    # lc.save_metrics_to_json_file(path='tests/load_iris/results_LabelCorrector_load_iris')
+    
+    metrics = {"original error rate PC_LabelCorrection": lc.metrics['original error rate']} | {"error rate after correction PC_LabelCorrection": lc.metrics['error rate after correction']} | CL_issues
+    
+    path='ocpc_detection'
+    # for metric, value in metrics.items():
+#        print(f"{metric}: {value}")
+        
+    save_metrics_to_json_file(path=path, metrics=metrics)
+    
+    # LOF detection
+    
+    lc = PC_LabelCorrector(detect_outlier_with_ocpc=False)
+    Y_adjusted = lc.run(X=iris_with_error["data"], Y=iris_with_error["target"])
+    
+    # Comparação com o CL
+    CL_issues = get_CL_label_correction(iris_with_error["data"], iris_with_error["target"], iris.target)
+    
+    # TODO: Gerar um arquivo json com as métricas do CL e do PC_labelCorrector para comparação
+    # lc.save_metrics_to_json_file(path='tests/load_iris/results_LabelCorrector_load_iris')
+    
+    metrics = {"original error rate PC_LabelCorrection": lc.metrics['original error rate']} | {"error rate after correction PC_LabelCorrection": lc.metrics['error rate after correction']} | CL_issues
+    
+    path='lof_detection'
+    # for metric, value in metrics.items():
+#        print(f"{metric}: {value}")
+        
+    save_metrics_to_json_file(path=path, metrics=metrics)
+    
+    # TODO: Preciso implementar a identificação de outliers com o ocpc
+    # TODO: Preciso tentar corrigir os rótulos de imagens usando o PC_LabelCorrector
+    

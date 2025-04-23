@@ -1,42 +1,94 @@
 {
-    "metric_2D": {
-        "original error rate PC_LabelCorrection": 0.0743,
-        "error rate after correction PC_LabelCorrection": 0.0693,
-        "original error rate CL": 0.099,
-        "error rate after correction CL": 0.099
+    "PC": {
+        "metric_2D": {
+            "original error rate PC_LabelCorrection": 0.0891,
+            "error rate after correction PC_LabelCorrection": 0.0792,
+            "original error rate CL": 0.099,
+            "error rate after correction CL": 0.099
+        },
+        "metric_breast_cancer": {
+            "original error rate PC_LabelCorrection": 0.0879,
+            "error rate after correction PC_LabelCorrection": 0.0457,
+            "original error rate CL": 0.0984,
+            "error rate after correction CL": 0.0492
+        },
+        "metric_load_iris": {
+            "original error rate PC_LabelCorrection": 0.06,
+            "error rate after correction PC_LabelCorrection": 0.0133,
+            "original error rate CL": 0.1,
+            "error rate after correction CL": 0.12
+        },
+        "metric_load_wine": {
+            "original error rate PC_LabelCorrection": 0.0674,
+            "error rate after correction PC_LabelCorrection": 0.0281,
+            "original error rate CL": 0.0899,
+            "error rate after correction CL": 0.0225
+        },
+        "indices_PC_LabelCorrection_before_fix_OCPC": {
+            "before_fix_mean": 0.0761,
+            "before_fix_variance": 0.00016078500000000004,
+            "before_fix_std": 0.012680102523244835
+        },
+        "indices_CL_before_fix_OCPC": {
+            "before_fix_mean": 0.096825,
+            "before_fix_variance": 1.6311875000000034e-05,
+            "before_fix_std": 0.004038796231552173
+        },
+        "indices_PC_LabelCorrection_after_fix_OCPC": {
+            "after_fix_mean": 0.027716666666666667,
+            "after_fix_variance": 0.000786391388888889,
+            "after_fix_std": 0.028042670858691207
+        },
+        "indices_CL_after_fix_OCPC": {
+            "after_fix_mean": 0.04845,
+            "after_fix_variance": 0.0021739125000000002,
+            "after_fix_std": 0.046625234583860274
+        }
     },
-    "metric_breast_cancer": {
-        "original error rate PC_LabelCorrection": 0.0826,
-        "error rate after correction PC_LabelCorrection": 0.0351,
-        "original error rate CL": 0.0984,
-        "error rate after correction CL": 0.0404
-    },
-    "metric_digits": {
-        "Erro": "<class 'Exception'>"
-    },
-    "metric_linnerud": {
-        "Erro": "<class 'Exception'>"
-    },
-    "metric_load_iris": {
-        "original error rate PC_LabelCorrection": 0.0867,
-        "error rate after correction PC_LabelCorrection": 0.0333,
-        "original error rate CL": 0.1,
-        "error rate after correction CL": 0.0333
-    },
-    "metric_load_wine": {
-        "original error rate PC_LabelCorrection": 0.1292,
-        "error rate after correction PC_LabelCorrection": 0.0506,
-        "original error rate CL": 0.0899,
-        "error rate after correction CL": 0.0337
-    },
-    "indices_PC_LabelCorrection": {
-        "mean": 0.03138333333333333,
-        "variance": 0.0006323780555555554,
-        "std": 0.02514712817710117
-    },
-    "indices_CL": {
-        "mean": 0.0344,
-        "variance": 0.001096263333333333,
-        "std": 0.033109867612742476
+    "LOF": {
+        "metric_2D": {
+            "original error rate PC_LabelCorrection": 0.0644,
+            "error rate after correction PC_LabelCorrection": 0.0594,
+            "original error rate CL": 0.099,
+            "error rate after correction CL": 0.099
+        },
+        "metric_breast_cancer": {
+            "original error rate PC_LabelCorrection": 0.1072,
+            "error rate after correction PC_LabelCorrection": 0.0457,
+            "original error rate CL": 0.0984,
+            "error rate after correction CL": 0.0457
+        },
+        "metric_load_iris": {
+            "original error rate PC_LabelCorrection": 0.1,
+            "error rate after correction PC_LabelCorrection": 0.0467,
+            "original error rate CL": 0.1,
+            "error rate after correction CL": 0.12
+        },
+        "metric_load_wine": {
+            "original error rate PC_LabelCorrection": 0.1236,
+            "error rate after correction PC_LabelCorrection": 0.0225,
+            "original error rate CL": 0.0899,
+            "error rate after correction CL": 0.0506
+        },
+        "indices_PC_LabelCorrection_before_fix_LOF": {
+            "before_fix_mean": 0.0988,
+            "before_fix_variance": 0.0004676000000000001,
+            "before_fix_std": 0.021624060673240818
+        },
+        "indices_CL_before_fix_LOF": {
+            "before_fix_mean": 0.096825,
+            "before_fix_variance": 1.6311875000000034e-05,
+            "before_fix_std": 0.004038796231552173
+        },
+        "indices_PC_LabelCorrection_after_fix_LOF": {
+            "after_fix_mean": 0.029049999999999996,
+            "after_fix_variance": 0.0005400958333333333,
+            "after_fix_std": 0.023239961990789343
+        },
+        "indices_CL_after_fix_LOF": {
+            "after_fix_mean": 0.05254999999999999,
+            "after_fix_variance": 0.0020468058333333334,
+            "after_fix_std": 0.045241638269776806
+        }
     }
 }

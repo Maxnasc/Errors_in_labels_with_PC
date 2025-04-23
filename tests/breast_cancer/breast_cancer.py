@@ -4,7 +4,7 @@ from utils.confident_learning import get_CL_label_correction
 from utils.utils import get_dataset_with_error, save_metrics_to_json_file
 import os
 
-def test_breast_cancer_dataset():
+def test_breast_cancer_dataset(outlier_detection_OCPC: bool):
     data = load_breast_cancer()
     erro_proposto = 0.1
     data_with_error = get_dataset_with_error(data.data, data.target, erro_proposto)
@@ -12,7 +12,7 @@ def test_breast_cancer_dataset():
     labels_wrong_before = sum(1 for i in range(len(data.target)) if data_with_error["target"][i] != data.target[i])
     print(f"Rótulos errados antes do ajuste: {labels_wrong_before}")
 
-    lc = PC_LabelCorrector()
+    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_OCPC)
     Y_adjusted = lc.run(X=data_with_error["data"], Y=data_with_error["target"])
 
     # Comparação com o CL

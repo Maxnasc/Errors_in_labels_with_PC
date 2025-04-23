@@ -4,7 +4,7 @@ from utils.confident_learning import get_CL_label_correction
 from utils.utils import get_dataset_with_error, save_metrics_to_json_file
 import os
 
-def test_load_wine_datset():
+def test_load_wine_datset(outlier_detection_OCPC: bool):
     wine = load_wine()
     erro_proposto = 0.1
     wine_with_error = get_dataset_with_error(wine.data, wine.target, erro_proposto)
@@ -15,7 +15,7 @@ def test_load_wine_datset():
 
     print(f"Rótulos errados antes do ajuste: {labels_wrong_before_adjustments}")
 
-    lc = PC_LabelCorrector()
+    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_OCPC)
     Y_adjusted = lc.run(X=wine_with_error["data"], Y=wine_with_error["target"])
 
     # Comparação com o CL
