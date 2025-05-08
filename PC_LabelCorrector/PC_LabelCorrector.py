@@ -101,7 +101,7 @@ class PC_LabelCorrector:
             scores (np.ndarray): distances from each point to the principal curve.
         """
         # Instantiate the OCPC classifier
-        ocpc = OneClassPC(k_max=n_segments, outlier_rate=contamination)
+        ocpc = OneClassPC(k_max=n_segments, outlier_rate=contamination, f=1)
         
         # Fit the model on the data
         ocpc.fit(X)
@@ -118,13 +118,13 @@ class PC_LabelCorrector:
         """
         Gets the OneClassPC curve for the inliers.
 
-        Args:
+        Args:   
             x_inlier_train: Inlier data to train the model
 
         Returns:
             OneClassPC curve
         """
-        clf = OneClassPC()
+        clf = OneClassPC(f=1)
         clf.fit(x_inlier_train)
         return clf.curve
 

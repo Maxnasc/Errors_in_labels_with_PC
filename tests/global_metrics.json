@@ -1,33 +1,33 @@
 {
     "PC": {
         "metric_2D": {
-            "original error rate PC_LabelCorrection": 0.0891,
-            "error rate after correction PC_LabelCorrection": 0.0792,
+            "original error rate PC_LabelCorrection": 0.0792,
+            "error rate after correction PC_LabelCorrection": 0.0545,
             "original error rate CL": 0.099,
             "error rate after correction CL": 0.099
         },
         "metric_breast_cancer": {
-            "original error rate PC_LabelCorrection": 0.0879,
-            "error rate after correction PC_LabelCorrection": 0.0457,
+            "original error rate PC_LabelCorrection": 0.0756,
+            "error rate after correction PC_LabelCorrection": 0.0316,
             "original error rate CL": 0.0984,
-            "error rate after correction CL": 0.0492
+            "error rate after correction CL": 0.0439
         },
         "metric_load_iris": {
-            "original error rate PC_LabelCorrection": 0.06,
-            "error rate after correction PC_LabelCorrection": 0.0133,
+            "original error rate PC_LabelCorrection": 0.0667,
+            "error rate after correction PC_LabelCorrection": 0.04,
             "original error rate CL": 0.1,
-            "error rate after correction CL": 0.12
+            "error rate after correction CL": 0.0267
         },
         "metric_load_wine": {
             "original error rate PC_LabelCorrection": 0.0674,
-            "error rate after correction PC_LabelCorrection": 0.0281,
+            "error rate after correction PC_LabelCorrection": 0.0225,
             "original error rate CL": 0.0899,
-            "error rate after correction CL": 0.0225
+            "error rate after correction CL": 0.0281
         },
         "indices_PC_LabelCorrection_before_fix_OCPC": {
-            "before_fix_mean": 0.0761,
-            "before_fix_variance": 0.00016078500000000004,
-            "before_fix_std": 0.012680102523244835
+            "before_fix_mean": 0.072225,
+            "before_fix_variance": 2.8461875000000035e-05,
+            "before_fix_std": 0.005334967197649863
         },
         "indices_CL_before_fix_OCPC": {
             "before_fix_mean": 0.096825,
@@ -35,45 +35,45 @@
             "before_fix_std": 0.004038796231552173
         },
         "indices_PC_LabelCorrection_after_fix_OCPC": {
-            "after_fix_mean": 0.027716666666666667,
-            "after_fix_variance": 0.000786391388888889,
-            "after_fix_std": 0.028042670858691207
+            "after_fix_mean": 0.02476666666666667,
+            "after_fix_variance": 0.00039912222222222225,
+            "after_fix_std": 0.01997804350336194
         },
         "indices_CL_after_fix_OCPC": {
-            "after_fix_mean": 0.04845,
-            "after_fix_variance": 0.0021739125000000002,
-            "after_fix_std": 0.046625234583860274
+            "after_fix_mean": 0.03295,
+            "after_fix_variance": 0.0011194158333333332,
+            "after_fix_std": 0.033457672264121024
         }
     },
     "LOF": {
         "metric_2D": {
-            "original error rate PC_LabelCorrection": 0.0644,
-            "error rate after correction PC_LabelCorrection": 0.0594,
+            "original error rate PC_LabelCorrection": 0.0495,
+            "error rate after correction PC_LabelCorrection": 0.0495,
             "original error rate CL": 0.099,
-            "error rate after correction CL": 0.099
+            "error rate after correction CL": 0.1089
         },
         "metric_breast_cancer": {
-            "original error rate PC_LabelCorrection": 0.1072,
-            "error rate after correction PC_LabelCorrection": 0.0457,
+            "original error rate PC_LabelCorrection": 0.0773,
+            "error rate after correction PC_LabelCorrection": 0.0404,
             "original error rate CL": 0.0984,
-            "error rate after correction CL": 0.0457
+            "error rate after correction CL": 0.0422
         },
         "metric_load_iris": {
-            "original error rate PC_LabelCorrection": 0.1,
-            "error rate after correction PC_LabelCorrection": 0.0467,
+            "original error rate PC_LabelCorrection": 0.1133,
+            "error rate after correction PC_LabelCorrection": 0.0533,
             "original error rate CL": 0.1,
-            "error rate after correction CL": 0.12
+            "error rate after correction CL": 0.0733
         },
         "metric_load_wine": {
-            "original error rate PC_LabelCorrection": 0.1236,
-            "error rate after correction PC_LabelCorrection": 0.0225,
+            "original error rate PC_LabelCorrection": 0.118,
+            "error rate after correction PC_LabelCorrection": 0.0393,
             "original error rate CL": 0.0899,
-            "error rate after correction CL": 0.0506
+            "error rate after correction CL": 0.0449
         },
         "indices_PC_LabelCorrection_before_fix_LOF": {
-            "before_fix_mean": 0.0988,
-            "before_fix_variance": 0.0004676000000000001,
-            "before_fix_std": 0.021624060673240818
+            "before_fix_mean": 0.089525,
+            "before_fix_variance": 0.0007818818749999999,
+            "before_fix_std": 0.027962150757765394
         },
         "indices_CL_before_fix_LOF": {
             "before_fix_mean": 0.096825,
@@ -81,14 +81,14 @@
             "before_fix_std": 0.004038796231552173
         },
         "indices_PC_LabelCorrection_after_fix_LOF": {
-            "after_fix_mean": 0.029049999999999996,
-            "after_fix_variance": 0.0005400958333333333,
-            "after_fix_std": 0.023239961990789343
+            "after_fix_mean": 0.030416666666666665,
+            "after_fix_variance": 0.00048612472222222224,
+            "after_fix_std": 0.022048236261030547
         },
         "indices_CL_after_fix_LOF": {
-            "after_fix_mean": 0.05254999999999999,
-            "after_fix_variance": 0.0020468058333333334,
-            "after_fix_std": 0.045241638269776806
+            "after_fix_mean": 0.04488333333333334,
+            "after_fix_variance": 0.0014903113888888892,
+            "after_fix_std": 0.038604551401212904
         }
     }
 }

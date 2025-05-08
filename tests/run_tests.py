@@ -139,6 +139,8 @@ def get_metrics_from_two_outlier_detection_method():
     df.to_excel('tests/global_metrics.xlsx', index=False)
 
 
+
+
 if __name__=="__main__":
     # # Run all the dataset tests, merge metrics results and grab diferences (global metrics)
     # global_metrics = {}
