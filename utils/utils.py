@@ -1,5 +1,7 @@
 import json
 import numpy as np
+import pandas as pd
+from copy import deepcopy
 
 def get_dataset_with_error(X, Y_original, erro_proposto):
 
@@ -41,11 +43,29 @@ def get_dataset_with_error(X, Y_original, erro_proposto):
     return data_with_error
 
 def save_metrics_to_json_file(path: str, metrics: dict):
+    
         # Save results to a JSON file
         if ".json" not in path:
             path = path + ".json"
 
         with open(path, "w") as f:
             json.dump(metrics, f, indent=4)
+
+        print(f"Results saved to {path}")
+        
+def save_metrics_to_csv_file(path: str, metrics: dict):
+
+        # Coverter os valores dentro de metrics para listas
+        new_metrics = deepcopy(metrics)
+        for key, value in new_metrics.items():
+            list_val = [value]
+            new_metrics[key] = list_val
+            
+        df = pd.DataFrame(new_metrics)
+        
+        if ".csv" not in path:
+            path = path + ".csv"
+        
+        df.to_csv(path);
 
         print(f"Results saved to {path}")

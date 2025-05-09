@@ -1,11 +1,24 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from ocpc_py import MultiClassPC
-import pandas as pd
-
 from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from utils.confident_learning import get_CL_label_correction
-from utils.utils import get_dataset_with_error, save_metrics_to_json_file
+from utils.utils import get_dataset_with_error, save_metrics_to_csv_file
+import os
+from codecarbon import EmissionsTracker
+
+def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str):
+    tracker = EmissionsTracker(output_dir="tests/sintetic_2D_dataset/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    tracker.start()
+    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_ocpc)
+    Y_adjusted = lc.run(X=data, Y=target)
+    tracker.stop()
+    return Y_adjusted, lc.metrics
+
+def run_confident_learning(data, target, original_target, tracker_prefix: str):
+    tracker = EmissionsTracker(output_dir="tests/sintetic_2D_dataset/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    tracker.start()
+    cl_issues = get_CL_label_correction(data, target, original_target)
+    tracker.stop()
+    return cl_issues
 
 def test_2D_sintetic_dataset(outlier_detection_OCPC: bool):
     x = np.linspace(-2, 2, num=101)
@@ -23,35 +36,38 @@ def test_2D_sintetic_dataset(outlier_detection_OCPC: bool):
     c2 = np.concatenate((xx,yy), axis = 1)
     c2_out = np.ones((c2.shape[0], 1))
 
-
-    plt.figure()
-    plt.plot(c1[:,0], c1[:,1], 'o')
-    plt.plot(c2[:,0], c2[:,1], 'r*')
-
     X = np.concatenate((c1, c2), axis = 0)
     Y = np.concatenate((c1_out, c2_out), axis = 0).flatten()  # Flatten Y to 1D
 
     erro_proposto = 0.1
     data_with_error = get_dataset_with_error(X, Y, erro_proposto)
 
-    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_OCPC)
-    Y_adjusted = lc.run(X=np.array(data_with_error["data"]), Y=np.array(data_with_error["target"]).flatten())  # Flatten target
+    labels_wrong_before = sum(1 for i in range(len(Y)) if data_with_error["target"][i] != Y[i])
+    print(f"Rótulos errados antes do ajuste: {labels_wrong_before}")
 
-    # Comparação com o CL
-    CL_issues = get_CL_label_correction(data_with_error["data"], data_with_error["target"], Y)
+    # Executando e rastreando emissões do PC_LabelCorrector
+    Y_adjusted_pc, metrics_pc = run_label_correction(
+        data_with_error["data"],
+        data_with_error["target"],
+        outlier_detection_OCPC,
+        f"PC_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+    )
 
-    # TODO: Gerar um arquivo json com as métricas do CL e do PC_labelCorrector para comparação
-    # lc.save_metrics_to_json_file(path='tests/load_iris/results_LabelCorrector_load_iris')
+    # Executando e rastreando emissões do Confident Learning
+    cl_issues = run_confident_learning(
+        data_with_error["data"],
+        data_with_error["target"],
+        Y,
+        f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+    )
 
-    metrics = {"original error rate PC_LabelCorrection": lc.metrics['original error rate']} | {"error rate after correction PC_LabelCorrection": lc.metrics['error rate after correction']} | CL_issues
+    metrics = {"original error rate PC_LabelCorrection": metrics_pc['original error rate']} | {"error rate after correction PC_LabelCorrection": metrics_pc['error rate after correction']} | cl_issues
 
     path='tests/sintetic_2D_dataset/comparation'
-    # for metric, value in metrics.items():
-#        print(f"{metric}: {value}")
-        
-    save_metrics_to_json_file(path=path, metrics=metrics)
-    
+    save_metrics_to_csv_file(path=path, metrics=metrics)
+
     return metrics
 
-if __name__=="__main__":
-    test_2D_sintetic_dataset()
+if __name__ == "__main__":
+    test_2D_sintetic_datset(outlier_detection_OCPC=True)
+    test_2D_sintetic_datset(outlier_detection_OCPC=False)

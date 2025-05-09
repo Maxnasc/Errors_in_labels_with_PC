@@ -1,8 +1,24 @@
 from sklearn.datasets import load_breast_cancer
 from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from utils.confident_learning import get_CL_label_correction
-from utils.utils import get_dataset_with_error, save_metrics_to_json_file
+from utils.utils import get_dataset_with_error, save_metrics_to_csv_file
 import os
+from codecarbon import EmissionsTracker
+
+def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str):
+    tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    tracker.start()
+    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_ocpc)
+    Y_adjusted = lc.run(X=data, Y=target)
+    tracker.stop()
+    return Y_adjusted, lc.metrics
+
+def run_confident_learning(data, target, original_target, tracker_prefix: str):
+    tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    tracker.start()
+    cl_issues = get_CL_label_correction(data, target, original_target)
+    tracker.stop()
+    return cl_issues
 
 def test_breast_cancer_dataset(outlier_detection_OCPC: bool):
     data = load_breast_cancer()
@@ -12,24 +28,29 @@ def test_breast_cancer_dataset(outlier_detection_OCPC: bool):
     labels_wrong_before = sum(1 for i in range(len(data.target)) if data_with_error["target"][i] != data.target[i])
     print(f"Rótulos errados antes do ajuste: {labels_wrong_before}")
 
-    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_OCPC)
-    Y_adjusted = lc.run(X=data_with_error["data"], Y=data_with_error["target"])
+    # Executando e rastreando emissões do PC_LabelCorrector
+    Y_adjusted_pc, metrics_pc = run_label_correction(
+        data_with_error["data"],
+        data_with_error["target"],
+        outlier_detection_OCPC,
+        f"PC_breast_cancer_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+    )
 
-    # Comparação com o CL
-    CL_issues = get_CL_label_correction(data_with_error["data"], data_with_error["target"], data.target)
-    
-    # TODO: Gerar um arquivo json com as métricas do CL e do PC_labelCorrector para comparação
-    # lc.save_metrics_to_json_file(path='tests/load_iris/results_LabelCorrector_load_iris')
-    
-    metrics = {"original error rate PC_LabelCorrection": lc.metrics['original error rate']} | {"error rate after correction PC_LabelCorrection": lc.metrics['error rate after correction']} | CL_issues
-    
+    # Executando e rastreando emissões do Confident Learning
+    cl_issues = run_confident_learning(
+        data_with_error["data"],
+        data_with_error["target"],
+        data.target,
+        f"CL_breast_cancer_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+    )
+
+    metrics = {"original error rate PC_LabelCorrection": metrics_pc['original error rate']} | {"error rate after correction PC_LabelCorrection": metrics_pc['error rate after correction']} | cl_issues
+
     path='tests/breast_cancer/comparation'
-    # for metric, value in metrics.items():
-#        print(f"{metric}: {value}")
-        
-    save_metrics_to_json_file(path=path, metrics=metrics)
-    
+    save_metrics_to_csv_file(path=path, metrics=metrics)
+
     return metrics
-    
+
 if __name__ == "__main__":
-    test_breast_cancer_dataset()
+    test_breast_cancer_dataset(outlier_detection_OCPC=True)
+    test_breast_cancer_dataset(outlier_detection_OCPC=False)

@@ -1,94 +1,88 @@
 {
     "PC": {
         "metric_2D": {
-            "original error rate PC_LabelCorrection": 0.0792,
-            "error rate after correction PC_LabelCorrection": 0.0545,
+            "original error rate PC_LabelCorrection": 0.0743,
+            "error rate after correction PC_LabelCorrection": 0.0644,
             "original error rate CL": 0.099,
             "error rate after correction CL": 0.099
         },
         "metric_breast_cancer": {
-            "original error rate PC_LabelCorrection": 0.0756,
-            "error rate after correction PC_LabelCorrection": 0.0316,
-            "original error rate CL": 0.0984,
-            "error rate after correction CL": 0.0439
+            "Erro": "Folder 'tests/breast_cancer/codecarbon_emissions' doesn't exist !"
         },
         "metric_load_iris": {
             "original error rate PC_LabelCorrection": 0.0667,
-            "error rate after correction PC_LabelCorrection": 0.04,
+            "error rate after correction PC_LabelCorrection": 0.0267,
             "original error rate CL": 0.1,
             "error rate after correction CL": 0.0267
         },
         "metric_load_wine": {
-            "original error rate PC_LabelCorrection": 0.0674,
+            "original error rate PC_LabelCorrection": 0.0618,
             "error rate after correction PC_LabelCorrection": 0.0225,
             "original error rate CL": 0.0899,
             "error rate after correction CL": 0.0281
         },
         "indices_PC_LabelCorrection_before_fix_OCPC": {
-            "before_fix_mean": 0.072225,
-            "before_fix_variance": 2.8461875000000035e-05,
-            "before_fix_std": 0.005334967197649863
+            "before_fix_mean": 0.0507,
+            "before_fix_variance": 0.000876665,
+            "before_fix_std": 0.029608529176573428
         },
         "indices_CL_before_fix_OCPC": {
-            "before_fix_mean": 0.096825,
-            "before_fix_variance": 1.6311875000000034e-05,
-            "before_fix_std": 0.004038796231552173
+            "before_fix_mean": 0.072225,
+            "before_fix_variance": 0.001754301875,
+            "before_fix_std": 0.04188438700757121
         },
         "indices_PC_LabelCorrection_after_fix_OCPC": {
-            "after_fix_mean": 0.02476666666666667,
-            "after_fix_variance": 0.00039912222222222225,
-            "after_fix_std": 0.01997804350336194
+            "after_fix_mean": 0.018933333333333333,
+            "after_fix_variance": 0.0005359455555555556,
+            "after_fix_std": 0.0231504979548077
         },
         "indices_CL_after_fix_OCPC": {
-            "after_fix_mean": 0.03295,
-            "after_fix_variance": 0.0011194158333333332,
-            "after_fix_std": 0.033457672264121024
+            "after_fix_mean": 0.02563333333333333,
+            "after_fix_variance": 0.0012268488888888894,
+            "after_fix_std": 0.035026402739774594
         }
     },
     "LOF": {
         "metric_2D": {
             "original error rate PC_LabelCorrection": 0.0495,
-            "error rate after correction PC_LabelCorrection": 0.0495,
+            "error rate after correction PC_LabelCorrection": 0.0297,
             "original error rate CL": 0.099,
             "error rate after correction CL": 0.1089
         },
         "metric_breast_cancer": {
-            "original error rate PC_LabelCorrection": 0.0773,
-            "error rate after correction PC_LabelCorrection": 0.0404,
-            "original error rate CL": 0.0984,
-            "error rate after correction CL": 0.0422
+            "Erro": "Folder 'tests/breast_cancer/codecarbon_emissions' doesn't exist !"
         },
         "metric_load_iris": {
-            "original error rate PC_LabelCorrection": 0.1133,
-            "error rate after correction PC_LabelCorrection": 0.0533,
+            "original error rate PC_LabelCorrection": 0.0933,
+            "error rate after correction PC_LabelCorrection": 0.0133,
             "original error rate CL": 0.1,
-            "error rate after correction CL": 0.0733
+            "error rate after correction CL": 0.0533
         },
         "metric_load_wine": {
-            "original error rate PC_LabelCorrection": 0.118,
-            "error rate after correction PC_LabelCorrection": 0.0393,
+            "original error rate PC_LabelCorrection": 0.0955,
+            "error rate after correction PC_LabelCorrection": 0.0506,
             "original error rate CL": 0.0899,
-            "error rate after correction CL": 0.0449
+            "error rate after correction CL": 0.0506
         },
         "indices_PC_LabelCorrection_before_fix_LOF": {
-            "before_fix_mean": 0.089525,
-            "before_fix_variance": 0.0007818818749999999,
-            "before_fix_std": 0.027962150757765394
+            "before_fix_mean": 0.059574999999999996,
+            "before_fix_variance": 0.0015196668749999998,
+            "before_fix_std": 0.03898290490715128
         },
         "indices_CL_before_fix_LOF": {
-            "before_fix_mean": 0.096825,
-            "before_fix_variance": 1.6311875000000034e-05,
-            "before_fix_std": 0.004038796231552173
+            "before_fix_mean": 0.072225,
+            "before_fix_variance": 0.001754301875,
+            "before_fix_std": 0.04188438700757121
         },
         "indices_PC_LabelCorrection_after_fix_LOF": {
-            "after_fix_mean": 0.030416666666666665,
-            "after_fix_variance": 0.00048612472222222224,
-            "after_fix_std": 0.022048236261030547
+            "after_fix_mean": 0.015599999999999998,
+            "after_fix_variance": 0.00035986333333333335,
+            "after_fix_std": 0.01897006413624723
         },
         "indices_CL_after_fix_LOF": {
-            "after_fix_mean": 0.04488333333333334,
-            "after_fix_variance": 0.0014903113888888892,
-            "after_fix_std": 0.038604551401212904
+            "after_fix_mean": 0.03546666666666667,
+            "after_fix_variance": 0.0016188588888888884,
+            "after_fix_std": 0.04023504553109004
         }
     }
 }
