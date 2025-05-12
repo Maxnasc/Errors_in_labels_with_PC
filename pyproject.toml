@@ -20,6 +20,7 @@ cleanlab = {version = "^2.7.1", extras = ["datalab"]}
 numpy = ">=1.26.0,<1.26.5"  # Versão específica para compatibilidade
 tqdm = "^4.67.1"
 codecarbon = "^3.0.0"
+deap = "^1.4.3"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"

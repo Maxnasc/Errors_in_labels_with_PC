@@ -52,5 +52,5 @@ def test_load_iris_dataset(outlier_detection_OCPC: bool):
     return metrics
 
 if __name__ == "__main__":
-    test_load_iris_datset(outlier_detection_OCPC=True)
-    test_load_iris_datset(outlier_detection_OCPC=False)
+    test_load_iris_dataset(outlier_detection_OCPC=True)
+    # test_load_iris_dataset(outlier_detection_OCPC=False)

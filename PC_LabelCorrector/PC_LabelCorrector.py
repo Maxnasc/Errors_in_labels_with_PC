@@ -13,7 +13,8 @@ os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
 class PC_LabelCorrector:
-    def __init__(self, detect_outlier_with_ocpc = True):
+    def __init__(self, detect_outlier_with_ocpc = True,  k_max = 5, alfa = 1, lamda = 1, close = False, buffer = 1000, f = 1.5, 
+                 outlier_rate = 0.1):
         """
         Initializes the LabelCorrector with attributes to store state.
         """
@@ -25,6 +26,13 @@ class PC_LabelCorrector:
 
         # parameters
         self.contamination = None
+        self.k_max = k_max
+        self.alfa  = alfa
+        self.lamda = lamda
+        self.buffer = buffer
+        self.close = close
+        self.f = f
+        self.outlier_rate = outlier_rate
 
     def _separate_for_each_class(self, X: np.array, Y: np.array) -> dict:
         """
@@ -87,7 +95,7 @@ class PC_LabelCorrector:
         scores = lof.negative_outlier_factor_
         return y_pred, scores
     
-    def _detect_outliers_ocpc(self, X, n_segments=10, contamination=0.1):
+    def _detect_outliers_ocpc(self, X):
         """
         Applies the One-Class Principal Curve (OCPC) to detect outliers.
 
@@ -101,7 +109,7 @@ class PC_LabelCorrector:
             scores (np.ndarray): distances from each point to the principal curve.
         """
         # Instantiate the OCPC classifier
-        ocpc = OneClassPC(k_max=n_segments, outlier_rate=contamination, f=1)
+        ocpc = OneClassPC(k_max = self.k_max, alfa = self.alfa, lamda = self.lamda, close = self.close, buffer = self.buffer, f = self.f, outlier_rate = self.outlier_rate)
         
         # Fit the model on the data
         ocpc.fit(X)
@@ -124,7 +132,7 @@ class PC_LabelCorrector:
         Returns:
             OneClassPC curve
         """
-        clf = OneClassPC(f=1)
+        clf = OneClassPC(k_max = self.k_max, alfa = self.alfa, lamda = self.lamda, close = self.close, buffer = self.buffer, f = self.f, outlier_rate = self.outlier_rate)
         clf.fit(x_inlier_train)
         return clf.curve
 
@@ -445,6 +453,5 @@ if __name__ == "__main__":
         
     save_metrics_to_json_file(path=path, metrics=metrics)
     
-    # TODO: Preciso implementar a identificação de outliers com o ocpc
     # TODO: Preciso tentar corrigir os rótulos de imagens usando o PC_LabelCorrector
     
