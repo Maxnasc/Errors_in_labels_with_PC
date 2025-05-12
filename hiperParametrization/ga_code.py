@@ -2,7 +2,8 @@ from deap import base, creator, tools, algorithms
 from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from sklearn.datasets import load_iris
 import random
-import numpy as np  # Import numpy
+import numpy as np
+from tqdm import tqdm  # Import the tqdm library
 
 from utils.utils import get_dataset_with_error
 
@@ -77,9 +78,14 @@ population = toolbox.population(n=50)
 ngen = 30
 cxpb, mutpb = 0.7, 0.2
 
-# Executar o algoritmo
-algorithms.eaSimple(population, toolbox, cxpb=cxpb, mutpb=mutpb, ngen=ngen, stats=None,
-                   halloffame=None, verbose=True) # Added verbose for debugging
+# Executar o algoritmo com barra de progresso
+print("Executando o Algoritmo Genético:")
+for gen in tqdm(range(ngen), desc="Gerações"):
+    offspring = algorithms.varAnd(population, toolbox, cxpb=cxpb, mutpb=mutpb)
+    fitnesses = list(map(toolbox.evaluate, offspring))
+    for ind, fit in zip(offspring, fitnesses):
+        ind.fitness.values = fit
+    population = toolbox.select(offspring, k=len(population))
 
 best_ind = tools.selBest(population, k=1)[0]
 print("Melhor indivíduo encontrado:", best_ind)
