@@ -170,4 +170,4 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     df.to_excel('tests/global_metrics.xlsx', index=False)
 
 if __name__=="__main__":
-    get_metrics_from_two_outlier_detection_method(n_samples=50)
+    get_metrics_from_two_outlier_detection_method(n_samples=10)

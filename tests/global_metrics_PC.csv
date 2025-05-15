@@ -1,9 +1,9 @@
-Métrica,original error rate PC_LabelCorrection,error rate after correction PC_LabelCorrection,original error rate CL,error rate after correction CL,before_fix_mean,before_fix_variance,before_fix_std,after_fix_mean,after_fix_variance,after_fix_std
-metric_2D,0.0693,0.0594,0.099,0.099,,,,,,
-metric_breast_cancer,0.0879,0.0562,0.0984,0.0527,,,,,,
-metric_load_iris,0.0333,0.0133,0.1,0.0533,,,,,,
-metric_load_wine,0.0618,0.0169,0.0899,0.0281,,,,,,
-indices_PC_LabelCorrection_before_fix_OCPC,,,,,0.063075,0.00038580187500000004,0.019641839908725457,,,
-indices_CL_before_fix_OCPC,,,,,0.096825,1.6311875000000034e-05,0.004038796231552173,,,
-indices_PC_LabelCorrection_after_fix_OCPC,,,,,,,,0.024300000000000002,0.00060106,0.02451652503924649
-indices_CL_after_fix_OCPC,,,,,,,,0.03885,0.0011921425000000002,0.0345274166424307
+Métrica,Erro,before_fix_mean,before_fix_variance,before_fix_std,after_fix_mean,after_fix_variance,after_fix_std
+metric_2D,can't convert type 'dict' to numerator/denominator,,,,,,
+metric_breast_cancer,can't convert type 'dict' to numerator/denominator,,,,,,
+metric_load_iris,can't convert type 'dict' to numerator/denominator,,,,,,
+metric_load_wine,can't convert type 'dict' to numerator/denominator,,,,,,
+indices_PC_LabelCorrection_before_fix_OCPC,,0.0,0.0,0.0,,,
+indices_CL_before_fix_OCPC,,0.0,0.0,0.0,,,
+indices_PC_LabelCorrection_after_fix_OCPC,,,,,0.0,0.0,0.0
+indices_CL_after_fix_OCPC,,,,,0.0,0.0,0.0
