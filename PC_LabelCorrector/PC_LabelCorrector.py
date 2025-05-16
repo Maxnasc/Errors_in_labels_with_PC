@@ -13,7 +13,7 @@ os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
 class PC_LabelCorrector:
-    def __init__(self, detect_outlier_with_ocpc = True,  k_max = 5, alfa = 0.7135, lamda = 1, close = False, buffer = 1000, f = 0.593, 
+    def __init__(self, detect_outlier_with_ocpc = True,  k_max = 5, alfa = 1, lamda = 1, close = False, buffer = 1000, f = 1.5, 
                  outlier_rate = 0.1):
         """
         Initializes the LabelCorrector with attributes to store state.
@@ -22,7 +22,8 @@ class PC_LabelCorrector:
         # config 02: k_max = 5, alfa = 0.7135, lamda = 1.1339, close = False, buffer = 1000, f = 0.593, outlier_rate = 0.1
         # config 03: k_max = 5, alfa = 0.7135, lamda = 1.1339, close = False, buffer = 1000, f = 1, outlier_rate = 0.1
         # config 04: k_max = 5, alfa = 0.7135, lamda = 1.1339, close = False, buffer = 1000, f = 0.593, outlier_rate = 0.1
-            
+        # config 05: k_max = 5, alfa = 0.7135, lamda = 1, close = False, buffer = 1000, f = 1, outlier_rate = 0.1
+        # config 06: k_max = 5, alfa = 0.7135, lamda = 1.1339, close = False, buffer = 1000, f = 1, outlier_rate = 0.1
 
         self.X_separated = None
         self.indexes_to_swap = None
@@ -213,7 +214,10 @@ class PC_LabelCorrector:
             distances_df = pd.DataFrame()
 
             for label, curve in curves_labeled.items():
-                _, dists = curve.map_to_arcl(x["x_outliers"])
+                if len(x["x_outliers"]) > 0:
+                    _, dists = curve.map_to_arcl(x["x_outliers"])
+                else:
+                    dists = []
                 distances_df[label] = dists
 
             adjusted_labels = distances_df.idxmin(axis=1)

@@ -1,9 +1,9 @@
-Métrica,Erro,before_fix_mean,before_fix_variance,before_fix_std,after_fix_mean,after_fix_variance,after_fix_std
-metric_2D,can't convert type 'dict' to numerator/denominator,,,,,,
-metric_breast_cancer,can't convert type 'dict' to numerator/denominator,,,,,,
-metric_load_iris,can't convert type 'dict' to numerator/denominator,,,,,,
-metric_load_wine,can't convert type 'dict' to numerator/denominator,,,,,,
-indices_PC_LabelCorrection_before_fix_OCPC,,0.0,0.0,0.0,,,
-indices_CL_before_fix_OCPC,,0.0,0.0,0.0,,,
-indices_PC_LabelCorrection_after_fix_OCPC,,,,,0.0,0.0,0.0
-indices_CL_after_fix_OCPC,,,,,0.0,0.0,0.0
+Métrica,original error rate PC_LabelCorrection,error rate after correction PC_LabelCorrection,original error rate CL,error rate after correction CL,before_fix_mean,before_fix_variance,before_fix_std,after_fix_mean,after_fix_variance,after_fix_std
+metric_2D,0.08070000000000001,0.0431,0.099,0.09999,,,,,,
+metric_breast_cancer,0.08207,0.0399,0.0984,0.04779,,,,,,
+metric_load_iris,0.062,0.018000000000000002,0.1,0.06068,,,,,,
+metric_load_wine,0.0736,0.01911,0.0899,0.03539,,,,,,
+indices_PC_LabelCorrection_before_fix_OCPC,,,,,0.0745925,6.319266875000004e-05,0.007949381658342997,,,
+indices_CL_before_fix_OCPC,,,,,0.096825,1.6311875000000034e-05,0.004038796231552173,,,
+indices_PC_LabelCorrection_after_fix_OCPC,,,,,,,,0.020018333333333332,0.00028906834722222224,0.017002010093580766
+indices_CL_after_fix_OCPC,,,,,,,,0.040641666666666666,0.001217654713888889,0.03489490956986261

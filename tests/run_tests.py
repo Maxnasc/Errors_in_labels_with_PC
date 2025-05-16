@@ -44,6 +44,23 @@ def run_and_track_emissions(dataset_function, outlier_detection_ocpc: bool = Non
     tracker.stop()
     return metrics
 
+def calculate_mean_of_samples(data: dict):
+    aux_global = {}
+    for dataset_name, dataset in data.items():
+        aux_dataset = {
+                        "original error rate PC_LabelCorrection": [],
+                        "error rate after correction PC_LabelCorrection": [],
+                        "original error rate CL": [],
+                        "error rate after correction CL": [],
+                       }
+        for resultado in dataset:
+            for key, value in resultado.items():
+                aux_dataset[key].append(value)
+        aux_global[dataset_name] = {}
+        for key, list_values in aux_dataset.items():
+            aux_global[dataset_name][key] = statistics.mean(list_values)
+    return aux_global
+
 def get_metrics_from_two_outlier_detection_method(n_samples: int):
     global_metrics_PC = {}
     global_metrics_LOF = {}
@@ -80,7 +97,7 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     except Exception as e:
         global_metrics_PC['metric_load_wine'] = {"Erro": str(e)}
 
-    global_metrics_PC = get_statistics(global_metrics_PC, '_OCPC')
+    global_metrics_PC = get_statistics(calculate_mean_of_samples(global_metrics_PC), '_OCPC')
 
     #####################################################################
 
@@ -116,7 +133,7 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     except Exception as e:
         global_metrics_LOF['metric_load_wine'] = {"Erro": str(e)}
 
-    global_metrics_LOF = get_statistics(global_metrics_LOF, '_LOF')
+    global_metrics_LOF = get_statistics(calculate_mean_of_samples(global_metrics_LOF), '_LOF')
 
     #####################################################################
 
@@ -170,4 +187,4 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     df.to_excel('tests/global_metrics.xlsx', index=False)
 
 if __name__=="__main__":
-    get_metrics_from_two_outlier_detection_method(n_samples=1)
+    get_metrics_from_two_outlier_detection_method(n_samples=10)
