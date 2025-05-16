@@ -51,12 +51,12 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     # Executando os testes com PC_LabelCorrector (OCPC = True) e rastreando emissões
     print("Executando testes com PC_LabelCorrector...")
     try:
-        global_metrics_PC['metric_2D'] = statistics.mean([run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=True, method_name="PC_2D") for i in range(n_samples)])
+        global_metrics_PC['metric_2D'] = [run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=True, method_name="PC_2D") for i in range(n_samples)]
     except Exception as e:
         global_metrics_PC['metric_2D'] = {"Erro": str(e)}
 
     try:
-        global_metrics_PC['metric_breast_cancer'] = statistics.mean([run_and_track_emissions(test_breast_cancer_dataset, outlier_detection_ocpc=True, method_name="PC_breast_cancer") for i in range(n_samples)])
+        global_metrics_PC['metric_breast_cancer'] = [run_and_track_emissions(test_breast_cancer_dataset, outlier_detection_ocpc=True, method_name="PC_breast_cancer") for i in range(n_samples)]
     except Exception as e:
         global_metrics_PC['metric_breast_cancer'] = {"Erro": str(e)}
 
@@ -71,12 +71,12 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     #     global_metrics_PC['metric_linnerud'] = {"Erro": str(e)}
 
     try:
-        global_metrics_PC['metric_load_iris'] = statistics.mean([run_and_track_emissions(test_load_iris_dataset, outlier_detection_ocpc=True, method_name="PC_load_iris") for i in range(n_samples)])
+        global_metrics_PC['metric_load_iris'] = [run_and_track_emissions(test_load_iris_dataset, outlier_detection_ocpc=True, method_name="PC_load_iris") for i in range(n_samples)]
     except Exception as e:
         global_metrics_PC['metric_load_iris'] = {"Erro": str(e)}
 
     try:
-        global_metrics_PC['metric_load_wine'] = statistics.mean([run_and_track_emissions(test_load_wine_dataset, outlier_detection_ocpc=True, method_name="PC_load_wine") for i in range(n_samples)])
+        global_metrics_PC['metric_load_wine'] = [run_and_track_emissions(test_load_wine_dataset, outlier_detection_ocpc=True, method_name="PC_load_wine") for i in range(n_samples)]
     except Exception as e:
         global_metrics_PC['metric_load_wine'] = {"Erro": str(e)}
 
@@ -87,12 +87,12 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     # Executando os testes com LOF (OCPC = False) e rastreando emissões
     print("Executando testes com Confident Learning (LOF)...")
     try:
-        global_metrics_LOF['metric_2D'] = statistics.mean([run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=False, method_name="CL_2D") for i in range(n_samples)])
+        global_metrics_LOF['metric_2D'] = [run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=False, method_name="CL_2D") for i in range(n_samples)]
     except Exception as e:
         global_metrics_LOF['metric_2D'] = {"Erro": str(e)}
 
     try:
-        global_metrics_LOF['metric_breast_cancer'] = statistics.mean([run_and_track_emissions(test_breast_cancer_dataset, outlier_detection_ocpc=False, method_name="CL_breast_cancer") for i in range(n_samples)])
+        global_metrics_LOF['metric_breast_cancer'] = [run_and_track_emissions(test_breast_cancer_dataset, outlier_detection_ocpc=False, method_name="CL_breast_cancer") for i in range(n_samples)]
     except Exception as e:
         global_metrics_LOF['metric_breast_cancer'] = {"Erro": str(e)}
 
@@ -107,12 +107,12 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     #     global_metrics_LOF['metric_linnerud'] = {"Erro": str(e)}
 
     try:
-        global_metrics_LOF['metric_load_iris'] = statistics.mean([run_and_track_emissions(test_load_iris_dataset, outlier_detection_ocpc=False, method_name="CL_load_iris") for i in range(n_samples)])
+        global_metrics_LOF['metric_load_iris'] = [run_and_track_emissions(test_load_iris_dataset, outlier_detection_ocpc=False, method_name="CL_load_iris") for i in range(n_samples)]
     except Exception as e:
         global_metrics_LOF['metric_load_iris'] = {"Erro": str(e)}
 
     try:
-        global_metrics_LOF['metric_load_wine'] = statistics.mean([run_and_track_emissions(test_load_wine_dataset, outlier_detection_ocpc=False, method_name="CL_load_wine") for i in range(n_samples)])
+        global_metrics_LOF['metric_load_wine'] = [run_and_track_emissions(test_load_wine_dataset, outlier_detection_ocpc=False, method_name="CL_load_wine") for i in range(n_samples)]
     except Exception as e:
         global_metrics_LOF['metric_load_wine'] = {"Erro": str(e)}
 
@@ -170,4 +170,4 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     df.to_excel('tests/global_metrics.xlsx', index=False)
 
 if __name__=="__main__":
-    get_metrics_from_two_outlier_detection_method(n_samples=10)
+    get_metrics_from_two_outlier_detection_method(n_samples=1)
