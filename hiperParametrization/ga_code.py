@@ -25,13 +25,10 @@ toolbox = base.Toolbox()
 toolbox.register("attr_k_max", random.randint, 2, 10)
 toolbox.register("attr_alfa", random.uniform, 0.1, 1.0)
 toolbox.register("attr_lamda", random.uniform, 0.1, 1.0)
-toolbox.register("attr_buffer", random.choice, [1000])
-toolbox.register("attr_f", random.uniform, 0.5, 1.0)
-toolbox.register("attr_outlier_rate", random.choice, [0.1])
+toolbox.register("attr_f", random.uniform, 0.5, 1.5)
 
 toolbox.register("individual", tools.initCycle, creator.Individual,
-                 (toolbox.attr_k_max, toolbox.attr_alfa, toolbox.attr_lamda,
-                  toolbox.attr_buffer, toolbox.attr_f, toolbox.attr_outlier_rate),
+                 (toolbox.attr_k_max, toolbox.attr_alfa, toolbox.attr_lamda,toolbox.attr_f,),
                  n=1)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
@@ -90,9 +87,9 @@ def run_ga_parallel(seed=None):
     random.seed(seed)
     np.random.seed(seed)
 
-    pop_size = 50
+    pop_size = 100
     generations = 30
-    cxpb, mutpb = 0.7, 0.2
+    cxpb, mutpb = 0.9, 0.1
     population = toolbox.population(n=pop_size)
 
     with yaspin(Spinners.dots, text="Rodando gerações da GA...") as sp:
@@ -117,7 +114,7 @@ def run_ga_parallel(seed=None):
 if __name__ == "__main__":
     freeze_support()
 
-    total_runs = 1
+    total_runs = 10
     results = []
 
     with Pool(processes=max(1, cpu_count()-1)) as pool:
