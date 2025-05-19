@@ -9,6 +9,8 @@ df_config_orig = pd.read_excel('tests/global_metrics_config_orig.xlsx')
 df_config_01 = pd.read_excel('tests/global_metrics_config_01.xlsx')
 df_config_02 = pd.read_excel('tests/global_metrics_config_02.xlsx')
 df_config_06 = pd.read_excel('tests/global_metrics_config_06.xlsx')
+df_config_07 = pd.read_excel('tests/global_metrics_config_07.xlsx')
+df_config_08 = pd.read_excel('tests/global_metrics_config_08.xlsx')
 
 lines_PC_mask = [4, 6]
 lines_CL_mask = [5, 7]
@@ -22,9 +24,13 @@ df_PC_02 = df_config_02.loc[lines_PC_mask, colums_mask]
 df_CL_02 = df_config_02.loc[lines_CL_mask, colums_mask]
 df_PC_06 = df_config_06.loc[lines_PC_mask, colums_mask]
 df_CL_06 = df_config_06.loc[lines_CL_mask, colums_mask]
+df_PC_07 = df_config_07.loc[lines_PC_mask, colums_mask]
+df_CL_07 = df_config_07.loc[lines_CL_mask, colums_mask]
+df_PC_08 = df_config_08.loc[lines_PC_mask, colums_mask]
+df_CL_08 = df_config_08.loc[lines_CL_mask, colums_mask]
 
-dfs_pc = {'original': df_PC_orig, 'config_01': df_PC_01, 'config_02': df_PC_02, 'config_06': df_PC_06}
-dfs_cl = {'original': df_CL_orig, 'config_01': df_CL_01, 'config_02': df_CL_02, 'config_06': df_CL_06}
+dfs_pc = {'original': df_PC_orig, 'config_01': df_PC_01, 'config_02': df_PC_02, 'config_06': df_PC_06, 'config_07': df_PC_06, 'config_08': df_PC_06}
+dfs_cl = {'original': df_CL_orig, 'config_01': df_CL_01, 'config_02': df_CL_02, 'config_06': df_CL_06, 'config_06': df_CL_07, 'config_06': df_CL_08}
 
 def get_after_fix_mean(df):
     """Retorna o valor de after_fix_mean da primeira linha não-NaN."""

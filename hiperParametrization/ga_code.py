@@ -22,11 +22,11 @@ if "Individual" not in creator.__dict__:
 
 # Espaço de busca otimizado
 toolbox = base.Toolbox()
-toolbox.register("attr_k_max", random.randint, 2, 20)
+toolbox.register("attr_k_max", random.randint, 2, 10)
 toolbox.register("attr_alfa", random.uniform, 0.1, 1.0)
 toolbox.register("attr_lamda", random.uniform, 0.1, 1.0)
 toolbox.register("attr_buffer", random.choice, [1000])
-toolbox.register("attr_f", random.uniform, 0.5, 3.0)
+toolbox.register("attr_f", random.uniform, 0.5, 1.0)
 toolbox.register("attr_outlier_rate", random.choice, [0.1])
 
 toolbox.register("individual", tools.initCycle, creator.Individual,
@@ -66,10 +66,24 @@ def evaluate_individual(individual):
         return (total_error / len(datasets),)
     except Exception:
         return (1.0,)
+    
+def mutate_with_limits(individual, mu, sigma, indpb):
+    mutated_individual = tools.mutGaussian(individual, mu=mu, sigma=sigma, indpb=indpb)[0]
+    # Aplicar limites para k_max
+    mutated_individual[0] = max(2, min(10, int(round(mutated_individual[0])))) # Arredonda para inteiro
+    # Aplicar limites para alfa
+    mutated_individual[1] = max(0.1, min(1.0, mutated_individual[1]))
+    # Aplicar limites para lamda
+    mutated_individual[2] = max(0.1, min(1.0, mutated_individual[2]))
+    # 'buffer' é uma escolha, então não precisa de limite
+    # Aplicar limites para f
+    mutated_individual[4] = max(0.5, min(1.0, mutated_individual[4]))
+    # 'outlier_rate' é uma escolha, então não precisa de limite
+    return mutated_individual,
 
 # Configuração do GA
 toolbox.register("mate", tools.cxTwoPoint)
-toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.1, indpb=0.2)
+toolbox.register("mutate", mutate_with_limits, mu=0, sigma=0.1, indpb=0.2)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 def run_ga_parallel(seed=None):

@@ -1,7 +1,7 @@
 import pandas as pd
 import statistics
 
-folder_names = ['orig', '01', '02', '06']
+folder_names = ['orig', '01', '02', '06', '07', '08']
 CL_file_names = ['CL_2D', 'CL_breast_cancer', 'CL_load_iris', 'CL_load_wine']
 PC_file_names = ['PC_2D', 'PC_breast_cancer', 'PC_load_iris', 'PC_load_wine']
 
