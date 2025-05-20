@@ -13,7 +13,7 @@ os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
 class PC_LabelCorrector:
-    def __init__(self, detect_outlier_with_ocpc = True,  k_max = 10, alfa = 0.23264431253985635, lamda = 0.49746871412451305, close = False, buffer = 1000, f = 1, 
+    def __init__(self, detect_outlier_with_ocpc = True,  k_max = 10, alfa = 0.6186, lamda = 0.5630, close = False, buffer = 1000, f = 1.2366, 
                  outlier_rate = 0.1):
         """
         Initializes the LabelCorrector with attributes to store state.
