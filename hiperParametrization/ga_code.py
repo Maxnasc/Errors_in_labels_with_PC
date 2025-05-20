@@ -28,8 +28,9 @@ toolbox.register("attr_lamda", random.uniform, 0.1, 1.0)
 toolbox.register("attr_f", random.uniform, 0.5, 1.5)
 
 toolbox.register("individual", tools.initCycle, creator.Individual,
-                 (toolbox.attr_k_max, toolbox.attr_alfa, toolbox.attr_lamda,toolbox.attr_f,),
+                 (toolbox.attr_k_max, toolbox.attr_alfa, toolbox.attr_lamda, toolbox.attr_f),
                  n=1)
+
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 # Carregar datasets uma única vez
@@ -47,9 +48,7 @@ def evaluate_individual(individual):
             'k_max': int(individual[0]),
             'alfa': float(individual[1]),
             'lamda': float(individual[2]),
-            'buffer': int(individual[3]),
-            'f': float(individual[4]),
-            'outlier_rate': float(individual[5]),
+            'f': float(individual[3]),
             'detect_outlier_with_ocpc': True
         }
 
@@ -63,20 +62,16 @@ def evaluate_individual(individual):
         return (total_error / len(datasets),)
     except Exception:
         return (1.0,)
+
     
 def mutate_with_limits(individual, mu, sigma, indpb):
     mutated_individual = tools.mutGaussian(individual, mu=mu, sigma=sigma, indpb=indpb)[0]
-    # Aplicar limites para k_max
-    mutated_individual[0] = max(2, min(10, int(round(mutated_individual[0])))) # Arredonda para inteiro
-    # Aplicar limites para alfa
-    mutated_individual[1] = max(0.1, min(1.0, mutated_individual[1]))
-    # Aplicar limites para lamda
-    mutated_individual[2] = max(0.1, min(1.0, mutated_individual[2]))
-    # 'buffer' é uma escolha, então não precisa de limite
-    # Aplicar limites para f
-    mutated_individual[4] = max(0.5, min(1.0, mutated_individual[4]))
-    # 'outlier_rate' é uma escolha, então não precisa de limite
+    mutated_individual[0] = max(2, min(10, int(round(mutated_individual[0]))))    # k_max
+    mutated_individual[1] = max(0.1, min(1.0, mutated_individual[1]))             # alfa
+    mutated_individual[2] = max(0.1, min(1.0, mutated_individual[2]))             # lamda
+    mutated_individual[3] = max(0.5, min(1.5, mutated_individual[3]))             # f
     return mutated_individual,
+
 
 # Configuração do GA
 toolbox.register("mate", tools.cxTwoPoint)
@@ -127,9 +122,7 @@ if __name__ == "__main__":
         'k_max': ind[0],
         'alfa': ind[1],
         'lamda': ind[2],
-        'buffer': ind[3],
-        'f': ind[4],
-        'outlier_rate': ind[5],
+        'f': ind[3],
         'avg_error_rate': error
     } for ind, error in zip(all_best_individuals, all_best_errors)])
 
@@ -152,3 +145,15 @@ if __name__ == "__main__":
     print("\n📊 Estatísticas das execuções:")
     print(f"Média da taxa de erro média: {mean_error:.4f}")
     print(f"Desvio padrão: {std_error:.4f}")
+
+    best_overall_idx = np.argmin(all_best_errors)
+    best_ind = all_best_individuals[best_overall_idx]
+    best_error = all_best_errors[best_overall_idx]
+
+    with open("best-subject.txt", "w") as f:
+        f.write("Melhor indivíduo:\n")
+        f.write(f"k_max: {int(best_ind[0])}\n")
+        f.write(f"alfa: {best_ind[1]:.4f}\n")
+        f.write(f"lamda: {best_ind[2]:.4f}\n")
+        f.write(f"f: {best_ind[3]:.4f}\n")
+        f.write(f"Erro médio: {best_error:.4f}\n")
