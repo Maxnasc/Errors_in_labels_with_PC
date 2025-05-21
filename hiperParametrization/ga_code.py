@@ -83,7 +83,7 @@ def run_ga_parallel(seed=None):
     np.random.seed(seed)
 
     pop_size = 100
-    generations = 30
+    generations = 100
     cxpb, mutpb = 0.9, 0.1
     population = toolbox.population(n=pop_size)
 
