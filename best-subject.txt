@@ -1,6 +1,6 @@
 Melhor indivíduo:
 k_max: 10
-alfa: 0.6186
-lamda: 0.5630
-f: 1.2366
-Erro médio: 0.0108
+alfa: 0.1244
+lamda: 0.3857
+f: 0.8296
+Erro médio: 0.0105
