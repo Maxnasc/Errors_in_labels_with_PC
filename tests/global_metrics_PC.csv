@@ -1,9 +1,9 @@
 Métrica,original error rate PC_LabelCorrection,error rate after correction PC_LabelCorrection,original error rate CL,error rate after correction CL,before_fix_mean,before_fix_variance,before_fix_std,after_fix_mean,after_fix_variance,after_fix_std
-metric_2D,0.08169,0.04607,0.099,0.09702,,,,,,
-metric_breast_cancer,0.08225,0.03779,0.0984,0.04482,,,,,,
-metric_load_iris,0.05734,0.01866,0.1,0.058,,,,,,
-metric_load_wine,0.07417,0.02248,0.0899,0.033710000000000004,,,,,,
-indices_PC_LabelCorrection_before_fix_OCPC,,,,,0.0738625,0.00010117686874999999,0.010058671321302828,,,
+metric_2D,0.08517,0.05448,0.099,0.10098,,,,,,
+metric_breast_cancer,0.07803,0.03498,0.0984,0.04518,,,,,,
+metric_load_iris,0.057339999999999995,0.02333,0.1,0.06335,,,,,,
+metric_load_wine,0.06852,0.02192,0.0899,0.0309,,,,,,
+indices_PC_LabelCorrection_before_fix_OCPC,,,,,0.072265,0.00010913872500000003,0.010446948118948425,,,
 indices_CL_before_fix_OCPC,,,,,0.096825,1.6311875000000034e-05,0.004038796231552173,,,
-indices_PC_LabelCorrection_after_fix_OCPC,,,,,,,,0.020833333333333332,0.0002999847222222222,0.017320067038618013
-indices_CL_after_fix_OCPC,,,,,,,,0.038924999999999994,0.0011385238583333332,0.03374201917984952
+indices_PC_LabelCorrection_after_fix_OCPC,,,,,,,,0.022451666666666665,0.00036533034722222225,0.01911361680117665
+indices_CL_after_fix_OCPC,,,,,,,,0.04006833333333334,0.0012622328805555556,0.035527916918327136
