@@ -1,6 +1,14 @@
 {
-    "original error rate PC_LabelCorrection": 0.0891,
-    "error rate after correction PC_LabelCorrection": 0.0594,
-    "original error rate CL": 0.099,
-    "error rate after correction CL": 0.0891
+    "ocpc": {
+        "correct_detected_outliers_rate": 0.009900990099009901,
+        "wrong_detected_outliers_rate": 0.06435643564356436,
+        "correct_adjusted_errors_pc_rate": 0.07425742574257425,
+        "wrong_adjusted_errors_pc_rate": 0.024752475247524754
+    },
+    "CL": {
+        "correct_detected_outliers_rate": 0.024752475247524754,
+        "wrong_detected_outliers_rate": 0.07425742574257425,
+        "correct_adjusted_errors_pc_rate": 0.07425742574257425,
+        "wrong_adjusted_errors_pc_rate": 0.024752475247524754
+    }
 }

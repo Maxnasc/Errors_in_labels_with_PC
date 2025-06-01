@@ -1,3 +1,5 @@
+import json
+import pandas as pd
 from sklearn.datasets import load_breast_cancer
 from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from utils.confident_learning import get_CL_label_correction
@@ -5,22 +7,22 @@ from utils.utils import get_dataset_with_error, save_metrics_to_csv_file
 import os
 from codecarbon import EmissionsTracker
 
-def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str):
-    tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
-    tracker.start()
-    lc = PC_LabelCorrector(detect_outlier_with_ocpc=outlier_detection_ocpc)
+def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str, k_max = int, alfa = float, lamda = float, f = float):
+    # tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    # tracker.start()
+    lc = PC_LabelCorrector(path='breast_cancer', detect_outlier_with_ocpc=outlier_detection_ocpc, k_max=k_max, alfa=alfa, lamda=lamda, f=f)
     Y_adjusted = lc.run(X=data, Y=target)
-    tracker.stop()
+    # tracker.stop()
     return Y_adjusted, lc.metrics
 
 def run_confident_learning(data, target, original_target, tracker_prefix: str):
-    tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
-    tracker.start()
-    cl_issues = get_CL_label_correction(data, target, original_target)
-    tracker.stop()
-    return cl_issues
+    # tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    # tracker.start()
+    cl_issues, issues = get_CL_label_correction(data, target, original_target)
+    # tracker.stop()
+    return cl_issues, issues
 
-def test_breast_cancer_dataset(outlier_detection_OCPC: bool):
+def test_breast_cancer_dataset(path: str, k_max = int, alfa = float, lamda = float, f = float, outlier_detection_OCPC=True):
     data = load_breast_cancer()
     erro_proposto = 0.1
     data_with_error = get_dataset_with_error(data.data, data.target, erro_proposto)
@@ -33,18 +35,68 @@ def test_breast_cancer_dataset(outlier_detection_OCPC: bool):
         data_with_error["data"],
         data_with_error["target"],
         outlier_detection_OCPC,
-        f"PC_breast_cancer_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+        f"PC_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}",
+        k_max=k_max, alfa=alfa, lamda=lamda, f=f
     )
 
     # Executando e rastreando emissões do Confident Learning
-    cl_issues = run_confident_learning(
+    cl_issues, issues = run_confident_learning(
         data_with_error["data"],
         data_with_error["target"],
-        data.target,
-        f"CL_breast_cancer_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+        data.get('target'),
+        f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
     )
+    
+    # entender quais labels estão errados
+    erros = [i for i, value in enumerate(data.get('target')) if value != data_with_error.get('target')[i]]
+    
+    if outlier_detection_OCPC:
+        caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_ocpc.json'
+        caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_ocpc.json'
+    else:
+        caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_lof.json'
+        caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_lof.json'
+    
+    with open(caminho_ouliers_pc, 'r') as opcl:
+        outliers_saved = json.load(opcl)    
+        
+    correct_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i in erros]
+    wrong_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i not in erros]
+    
+    correct_adjusted_errors_pc = [o for i, o in enumerate(Y_adjusted_pc) if i in erros and o == data.get('target')[i]]
+    wrong_adjusted_errors_pc = [o for i, o in enumerate(Y_adjusted_pc) if i in erros and o != data.get('target')[i]]    
 
-    metrics = {"original error rate PC_LabelCorrection": metrics_pc['original error rate']} | {"error rate after correction PC_LabelCorrection": metrics_pc['error rate after correction']} | cl_issues
+    correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label']==issues['original_labels'])]
+    wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label']!=issues['original_labels'])]
+    
+    correct_adjusted_errors_CL = issues[issues['is_label_issue'] & (issues['predicted_label']==issues['original_labels'])]
+    wrong_adjusted_errors_CL = issues[issues['is_label_issue'] & (issues['predicted_label']!=issues['original_labels'])]
+    
+    resultado_outliers_ocpc = {
+        'correct_detected_outliers_rate': len(correct_detected_outliers)/len(data.get('target')),
+        'wrong_detected_outliers_rate': len(wrong_detected_outliers)/len(data.get('target')),
+        'correct_adjusted_errors_pc_rate': len(correct_adjusted_errors_pc)/len(data.get('target')),
+        'wrong_adjusted_errors_pc_rate': len(wrong_adjusted_errors_pc)/len(data.get('target')),
+    }
+    
+    resultado_outliers_CL = {
+        'correct_detected_outliers_rate': correct_outliers_detected_CL.shape[0]/len(data.get('target')),
+        'wrong_detected_outliers_rate': wrong_false_alarm_CL.shape[0]/len(data.get('target')),
+        'correct_adjusted_errors_pc_rate': correct_adjusted_errors_CL.shape[0]/len(data.get('target')),
+        'wrong_adjusted_errors_pc_rate': wrong_adjusted_errors_CL.shape[0]/len(data.get('target')),
+    }
+        
+    with open(caminho_ocpc, "w") as f:
+        json.dump(resultado_outliers_ocpc, f, indent=4)
+        
+    with open('tests/sintetic_2D_dataset/outliers_result_cl.json', "w") as f:
+        json.dump(resultado_outliers_CL, f, indent=4)
+
+    metrics = {
+        "ocpc": resultado_outliers_ocpc,
+        "CL": resultado_outliers_CL
+    }
+    # metrics = {"original error rate PC_LabelCorrection": metrics_pc['original error rate']} | {"error rate after correction PC_LabelCorrection": metrics_pc['error rate after correction']} | cl_issues
 
     path='tests/breast_cancer/comparation'
     save_metrics_to_csv_file(path=path, metrics=metrics)

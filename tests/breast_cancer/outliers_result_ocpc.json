@@ -1,0 +1,6 @@
+{
+    "correct_detected_outliers_rate": 0.01054481546572935,
+    "wrong_detected_outliers_rate": 0.07381370826010544,
+    "correct_adjusted_errors_pc_rate": 0.02460456942003515,
+    "wrong_adjusted_errors_pc_rate": 0.07381370826010544
+}

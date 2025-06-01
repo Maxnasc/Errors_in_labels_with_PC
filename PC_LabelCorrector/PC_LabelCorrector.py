@@ -1,4 +1,5 @@
 import json
+from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from ocpc_py import OneClassPC
@@ -13,7 +14,7 @@ os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
 class PC_LabelCorrector:
-    def __init__(self, detect_outlier_with_ocpc = True,  k_max = 10, alfa = 0.1244, lamda = 0.3857, close = False, buffer = 1000, f = 0.8296, 
+    def __init__(self, path: str, detect_outlier_with_ocpc = True,  k_max = 10, alfa = 0.1244, lamda = 0.3857, close = False, buffer = 1000, f = 0.8296, 
                  outlier_rate = 0.1):
         """
         Initializes the LabelCorrector with attributes to store state.
@@ -42,6 +43,8 @@ class PC_LabelCorrector:
         self.close = close
         self.f = f
         self.outlier_rate = outlier_rate
+        
+        self.path = path
 
     def _separate_for_each_class(self, X: np.array, Y: np.array) -> dict:
         """
@@ -85,6 +88,7 @@ class PC_LabelCorrector:
             X["x_outliers"] = np.array(
                 [x for i, x in enumerate(X["X"]) if preditc[i] == -1]
             )
+            X['predict'] = preditc
         return result
 
     def _detect_outliers_lof(self, X):
@@ -102,6 +106,7 @@ class PC_LabelCorrector:
         )
         y_pred = lof.fit_predict(X)
         scores = lof.negative_outlier_factor_
+        
         return y_pred, scores
     
     def _detect_outliers_ocpc(self, X):
@@ -158,6 +163,21 @@ class PC_LabelCorrector:
         result = x_separated.copy()
         for class_label, X in result.items():
             X["curve"] = self._get_OneClass_curve(X.get("x_inliers"))
+            # Plotar a curva com os dados de inliers e outliers indicados
+            # fig, ax = plt.subplots()
+            # x_inliers = X.get("x_inliers")
+            # x_outliers = X.get("x_outliers")
+            # if x_inliers is not None and len(x_inliers) > 0:
+            #     if x_inliers.ndim == 2 and x_inliers.shape[1] >= 2:
+            #         ax.scatter(x_inliers[:, 0], x_inliers[:, 1], marker='o', label='Inliers')
+            #     else:
+            #         ax.scatter(np.arange(len(x_inliers)), x_inliers, marker='o', label='Inliers')
+            # if x_outliers is not None and len(x_outliers) > 0:
+            #     if x_outliers.ndim == 2 and x_outliers.shape[1] >= 2:
+            #         ax.scatter(x_outliers[:, 0], x_outliers[:, 1], marker='*', label='Outliers')
+            #     else:
+            #         ax.scatter(np.arange(len(x_outliers)), x_outliers, marker='*', label='Outliers')
+            # X["curve"].plot_curve(ax)
         return result
 
     def _identify_indexes_to_adjust(self, x_outlier_labeled, X):
@@ -302,6 +322,19 @@ class PC_LabelCorrector:
         )
 
         return metrics
+    
+    def save_outliers(self):
+        outliers = []
+        for classe, valores_classes in self.X_separated.items():
+            outliers.extend(valores_classes.get('predict'))
+        
+        if self.detect_outlier_with_ocpc:
+            caminho = f'tests/{self.path}/outliers_ocpc.json'
+        else:
+            caminho = f'tests/{self.path}/outliers_lof.json'
+            
+        with open(caminho, "w") as f:
+            json.dump([int(o) for o in outliers], f, indent=4)
 
     def run(
         self, X: np.array, Y: np.array, contamination="auto"
@@ -359,6 +392,8 @@ class PC_LabelCorrector:
 
         self.metrics = self._mount_metrics()
 
+        self.save_outliers()
+        
         return self.Y_adjusted
 
     def save_metrics_to_json_file(self, path: str):

@@ -43,14 +43,14 @@ def get_CL_label_correction(X, Y_error, Y_original):
     porcentagem_labels_erradas_depois_do_CL = (issues['predicted_label'] != issues['original_labels']).mean()
     score_correcao = porcentagem_labels_erradas_antes_CL - porcentagem_labels_erradas_depois_do_CL
     
-    metrics = {    }
+    metrics = {}
     # Getting the original error rate
     metrics["original error rate CL"] = round(porcentagem_labels_erradas_antes_CL, 4)
 
     # Getting the error rate after correction
     metrics["error rate after correction CL"] = round(porcentagem_labels_erradas_depois_do_CL, 4)
         
-    return metrics
+    return metrics, issues
 
 def get_CL_label_correction_simple(X, Y_error, Y_original):
     """
