@@ -1,10 +1,8 @@
-import itertools
 import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from sklearn.datasets import load_iris, load_breast_cancer, load_wine
 from deap import base, creator, tools, algorithms
 from multiprocessing import Pool, cpu_count, freeze_support
 import os
@@ -12,24 +10,23 @@ from yaspin import yaspin
 from yaspin.spinners import Spinners
 import time
 
-# Importar as quatro funções de teste (que já instanciam internamente o PC_LabelCorrector)
+# Importar as quatro funções de teste
 from tests.breast_cancer.breast_cancer import test_breast_cancer_dataset
 from tests.load_iris.load_iris import test_load_iris_dataset
 from tests.load_wine.load_wine import test_load_wine_dataset
 from tests.sintetic_2D_dataset.sintetic_2D_dataset import test_2D_sintetic_dataset
 
-# -----------------------------------------------------------------------------
-# 1. Modificar o creator para Múltiplos Objetivos (agora 5 objetivos)
-#     todos os cinco devem ser minimizados, portanto os pesos são todos -1.0
-if "FitnessMultiObj" not in creator.__dict__:
-    creator.create("FitnessMultiObj", base.Fitness,
-                   weights=(-1.0, -1.0, -1.0, -1.0, -1.0))
+# -------------------------------------------------------------------
+# 1. Criar as classes de Fitness e Individual para MULTI-OBJETIVOS (3 objetivos agora)
+#    Todos os três objetivos serão minimizados → pesos = -1.0 cada.
+if "Fitness3Obj" not in creator.__dict__:
+    creator.create("Fitness3Obj", base.Fitness, weights=(-1.0, -1.0, -1.0))
 
 if "Individual" not in creator.__dict__:
-    creator.create("Individual", list, fitness=creator.FitnessMultiObj)
+    creator.create("Individual", list, fitness=creator.Fitness3Obj)
 
-# -----------------------------------------------------------------------------
-# Espaço de busca para os indivíduos (quatro hiperparâmetros do PC_LabelCorrector)
+# -------------------------------------------------------------------
+# 2. Espaço de busca (quatro hiperparâmetros do PC_LabelCorrector)
 toolbox = base.Toolbox()
 toolbox.register("attr_k_max", random.randint, 2, 10)
 toolbox.register("attr_alfa", random.uniform, 0.1, 1.0)
@@ -44,110 +41,86 @@ toolbox.register("individual", tools.initCycle, creator.Individual,
                  n=1)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-# -----------------------------------------------------------------------------
-# Lista das quatro funções de teste e seus “paths” correspondentes:
+# -------------------------------------------------------------------
+# 3. Lista das quatro funções de teste e seus “paths” correspondentes:
 test_functions = [
-    (test_breast_cancer_dataset,         "breast_cancer"),
-    (test_load_iris_dataset,             "load_iris"),
-    (test_load_wine_dataset,             "load_wine"),
-    (test_2D_sintetic_dataset,           "sintetic_2D_dataset")
+    (test_breast_cancer_dataset, "breast_cancer"),
+    (test_load_iris_dataset,     "load_iris"),
+    (test_load_wine_dataset,     "load_wine"),
+    (test_2D_sintetic_dataset,   "sintetic_2D_dataset")
 ]
 
-# -----------------------------------------------------------------------------
-# 2. Função de avaliação adaptada para 5 objetivos
+# -------------------------------------------------------------------
+# 4. Função de avaliação adaptada para 3 objetivos
 def evaluate_individual(individual):
     """
-    Cada indivíduo é [k_max, alfa, lamda, f]. Chamamos as quatro funções de teste,
-    medimos o tempo de cada execução e extraímos, do dicionário retornado,
-    as métricas ocpc[…]. Por fim, montamos um vetor-fitness com 5 valores:
-        1) | correct_detected_outliers_rate – 0.1 |
-        2) wrong_detected_outliers_rate
-        3) | correct_adjusted_errors_pc_rate – 0.1 |
-        4) wrong_adjusted_errors_pc_rate
-        5) total_time (soma de todos os tempos de cada teste)
+    Cada indivíduo é [k_max, alfa, lamda, f].
+    Chamamos as quatro funções de teste, extraímos as métricas ocpc[…]
+    e montamos um vetor-fitness de 3 valores:
+        1) |avg_cdor – 0.1|     (obj1)
+        2) |avg_caer – 0.1|    (obj3)
+        3) total_time           (obj5)
     """
     try:
-        # Extrair os hiperparâmetros do indivíduo
         k_max = int(individual[0])
-        alfa = float(individual[1])
+        alfa  = float(individual[1])
         lamda = float(individual[2])
-        f = float(individual[3])
+        f     = float(individual[3])
 
-        # Somas acumuladas das métricas (para depois tirar média)
-        sum_cdor = 0.0  # correct_detected_outliers_rate
-        sum_wdor = 0.0  # wrong_detected_outliers_rate
-        sum_caer = 0.0  # correct_adjusted_errors_pc_rate
-        sum_waer = 0.0  # wrong_adjusted_errors_pc_rate
-
+        sum_cdor = 0.0
+        sum_caer = 0.0
         total_time = 0.0
 
-        # Número de funções de teste
         n_tests = len(test_functions)
 
         for (test_func, path_str) in test_functions:
             start_time = time.perf_counter()
-            # Chama a função de teste, que retorna dicionário com a chave "ocpc" e seus valores
             results_dict = test_func(path_str, k_max, alfa, lamda, f)
             end_time = time.perf_counter()
-
             elapsed = end_time - start_time
             total_time += elapsed
 
-            # Extrair somente a parte “ocpc” do dicionário retornado
             ocpc = results_dict.get("ocpc", {})
-
-            # Acumular cada métrica
             sum_cdor += ocpc.get("correct_detected_outliers_rate", 0.0)
-            sum_wdor += ocpc.get("wrong_detected_outliers_rate", 0.0)
             sum_caer += ocpc.get("correct_adjusted_errors_pc_rate", 0.0)
-            sum_waer += ocpc.get("wrong_adjusted_errors_pc_rate", 0.0)
 
-        # Médias (para cada métrica)
         avg_cdor = sum_cdor / n_tests
-        avg_wdor = sum_wdor / n_tests
         avg_caer = sum_caer / n_tests
-        avg_waer = sum_waer / n_tests
 
-        # Objetivos construídos a partir dessas médias:
-        # 1) | avg_cdor – 0.1 |      (quanto mais próximo de 0.1, melhor)
-        # 2) avg_wdor              (quanto menor, melhor)
-        # 3) | avg_caer – 0.1 |     (quanto mais próximo de 0.1, melhor)
-        # 4) avg_waer              (quanto menor, melhor)
-        # 5) total_time            (quanto menor, melhor)
         obj1 = abs(avg_cdor - 0.1)
-        obj2 = avg_wdor
         obj3 = abs(avg_caer - 0.1)
-        obj4 = avg_waer
         obj5 = total_time
 
-        return (obj1, obj2, obj3, obj4, obj5)
+        return (obj1, obj3, obj5)
 
     except Exception as e:
-        # Penaliza indivíduos que causarem erro: fitness altos
-        print(f"Erro na avaliação do indivíduo {individual}: {e}")
-        # Retorna valores muito grandes para cada objetivo
-        return (1.0, 1.0, 1.0, 1.0, 1e3)
+        # Se falhar, penaliza com valores grandes
+        print(f"[ERROR] Avaliação falhou para indivíduo {individual}: {e}")
+        return (1.0, 1.0, 1e3)
 
-# -----------------------------------------------------------------------------
-# Função de mutação (igual à sua, com restrição de limites)
+# -------------------------------------------------------------------
+# 5. Função de mutação (com limites nos parâmetros)
 def mutate_with_limits(individual, mu, sigma, indpb):
     mutated_ind = tools.mutGaussian(individual, mu=mu, sigma=sigma, indpb=indpb)[0]
-    # Limitar cada parâmetro após a mutação
     mutated_ind[0] = max(2,  min(10, int(round(mutated_ind[0]))))   # k_max
-    mutated_ind[1] = max(0.1, min(1.0, mutated_ind[1]))            # alfa
-    mutated_ind[2] = max(0.1, min(1.0, mutated_ind[2]))            # lamda
-    mutated_ind[3] = max(0.5, min(1.5, mutated_ind[3]))            # f
+    mutated_ind[1] = max(0.1, min(1.0, mutated_ind[1]))             # alfa
+    mutated_ind[2] = max(0.1, min(1.0, mutated_ind[2]))             # lamda
+    mutated_ind[3] = max(0.5, min(1.5, mutated_ind[3]))             # f
     return mutated_ind,
 
-# -----------------------------------------------------------------------------
-# Registrar as operações genéticas
-toolbox.register("mate", tools.cxTwoPoint)
-toolbox.register("mutate", mutate_with_limits, mu=0, sigma=0.1, indpb=0.2)
-toolbox.register("select", tools.selNSGA2)          # NSGA-II para seleção multiobjetivo
-toolbox.register("evaluate", evaluate_individual)   # Nossa nova função de avaliação
+# -------------------------------------------------------------------
+# 6. Registrar as operações genéticas no toolbox
+toolbox.register("mate",    tools.cxTwoPoint)
+toolbox.register("mutate",  mutate_with_limits, mu=0, sigma=0.1, indpb=0.2)
+toolbox.register("select",  tools.selNSGA2)          # Seleção NSGA-II
+toolbox.register("evaluate", evaluate_individual)    # Função de avaliação
 
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------
 def run_nsga2_parallel(seed=None):
+    """
+    Executa o NSGA-II UMA única vez, paralelizando APENAS a avaliação de indivíduos.
+    Retorna um objeto ParetoFront() contendo todos os indivíduos não-dominados.
+    """
     random.seed(seed)
     np.random.seed(seed)
 
@@ -155,89 +128,94 @@ def run_nsga2_parallel(seed=None):
     generations = 100
     cxpb, mutpb = 0.9, 0.1
 
+    # 1) Criar população inicial
     population = toolbox.population(n=pop_size)
 
-    with yaspin(Spinners.dots, text="Rodando NSGA-II...") as sp:
-        # O algorithms.eaMuPlusLambda usa a função `map` registrada na toolbox
-        # para paralelizar avaliações (via Pool). Ele retorna (população_final, logbook)
-        population, logbook = algorithms.eaMuPlusLambda(
-            population, toolbox,
-            mu=pop_size,            # número de pais
-            lambda_=pop_size,       # número de filhos gerados
-            cxpb=cxpb,
-            mutpb=mutpb,
-            ngen=generations,
-            stats=None,
-            halloffame=None,
-            verbose=False
-        )
-        sp.text = "NSGA-II concluído!"
-        sp.ok("✅")
+    # 2) Container para não-dominados ao longo das gerações
+    pareto_hof = tools.ParetoFront()
 
-    # Extrair a primeira fronteira de Pareto (não-dominados) da última geração
-    pareto_front = tools.sortNondominated(population, k=pop_size, first_front_only=True)[0]
-    return pareto_front
+    # 3) Abrir Pool de processos para paralelizar avaliação
+    n_cores = cpu_count()
+    print(f"[DEBUG] Inicializando Pool com {n_cores} processos.")
+    with Pool(processes=n_cores) as pool:
+        toolbox.register("map", pool.map)
 
-# -----------------------------------------------------------------------------
+        # 4) Rodar o NSGA-II
+        with yaspin(Spinners.dots, text="Rodando NSGA-II...") as spinner:
+            pop_final, logbook = algorithms.eaMuPlusLambda(
+                population, toolbox,
+                mu=pop_size,
+                lambda_=pop_size,
+                cxpb=cxpb,
+                mutpb=mutpb,
+                ngen=generations,
+                stats=None,
+                halloffame=pareto_hof,
+                verbose=False
+            )
+            spinner.text = "NSGA-II concluído!"
+            spinner.ok("✅")
+
+    print(f"[DEBUG] {len(pareto_hof)} indivíduos na fronteira de Pareto final.")
+    return pareto_hof
+
+# -------------------------------------------------------------------
 if __name__ == "__main__":
-    freeze_support()  # continua presente apenas para Windows, mas não há Pool
+    freeze_support()  # Para compatibilidade no Windows
 
-    total_runs = 5
+    # 1. Executar NSGA-II UMA vez
+    pareto_front = run_nsga2_parallel(seed=42)
+
+    # 2. Extrair todos os indivíduos não-dominados e montar DataFrame
     all_pareto_points = []
+    for ind in pareto_front:
+        all_pareto_points.append({
+            'k_max': int(ind[0]),
+            'alfa': float(ind[1]),
+            'lamda': float(ind[2]),
+            'f': float(ind[3]),
+            'obj1_cdor_dist_to_0.1': ind.fitness.values[0],
+            'obj3_caer_dist_to_0.1': ind.fitness.values[1],
+            'obj5_time': ind.fitness.values[2]
+        })
 
-    # **NÃO USAR Pool nem registrar toolbox.map**
-    # Ou seja, não há:
-    #   with Pool(...) as pool:
-    #       toolbox.register("map", pool.map)
-    #       ...
-    #
-    # Em vez disso, tudo roda de forma sequencial:
+    df_results = pd.DataFrame(all_pareto_points)
+    os.makedirs("hiperParametrization", exist_ok=True)
 
-    for run_idx in tqdm(range(total_runs), desc="Executando runs do NSGA-II"):
-        pareto = run_nsga2_parallel(seed=run_idx)
-        for ind in pareto:
-            all_pareto_points.append({
-                'k_max': int(ind[0]),
-                'alfa': float(ind[1]),
-                'lamda': float(ind[2]),
-                'f': float(ind[3]),
-                'obj1_cdor_dist_to_0.1': ind.fitness.values[0],
-                'obj2_wdor': ind.fitness.values[1],
-                'obj3_caer_dist_to_0.1': ind.fitness.values[2],
-                'obj4_waer': ind.fitness.values[3],
-                'obj5_time': ind.fitness.values[4]
-            })
+    # 3. Salvar CSV com a fronteira de Pareto
+    df_results.to_csv("resultados_pareto_3objetivos.csv", index=False)
+    print("✅ Fronteira de Pareto salva em 'resultados_pareto_3objetivos.csv'.")
 
-    # Salvar CSV e plotar, etc. (mesmo de antes)
-    df_results_mo = pd.DataFrame(all_pareto_points)
-    df_results_mo.to_csv("resultados_otimizacao_ga_multiobjetivo.csv", index=False)
-    print("\n✅ Otimização multiobjetivo concluída! (CSV gerado)")
+    # 4. Calcular soma ponderada (pesos: obj1→1.0, obj3→1.5, obj5→1.2)
+    df_results['weighted_sum'] = (
+        1.0 * df_results['obj1_cdor_dist_to_0.1'] +
+        1.5 * df_results['obj3_caer_dist_to_0.1'] +
+        1.2 * df_results['obj5_time']
+    )
 
-    # Plotar a fronteira de Pareto agregada (erro de detecção × tempo) como exemplo
-    if not df_results_mo.empty:
-        plt.figure(figsize=(10, 8))
-        # Como exemplo, plotaremos: |cdor - 0.1| vs tempo (objetivos 1 e 5)
-        plt.scatter(df_results_mo['obj1_cdor_dist_to_0.1'],
-                    df_results_mo['obj5_time'],
+    # 5. Identificar melhor indivíduo global (menor weighted_sum)
+    idx_best = df_results['weighted_sum'].idxmin()
+    best_row = df_results.loc[idx_best]
+
+    # 6. Salvar melhor indivíduo em CSV separado
+    df_best = best_row.to_frame().T
+    df_best.to_csv("hiperParametrization/best-subject.csv", index=False)
+    print(f"✅ Melhor indivíduo salvo em 'hiperParametrization/best-subject.csv'.")
+
+    # 7. (Opcional) Plotar Pareto (obj1 × obj5)
+    if not df_results.empty:
+        plt.figure(figsize=(8, 6))
+        plt.scatter(df_results['obj1_cdor_dist_to_0.1'],
+                    df_results['obj5_time'],
                     c='blue', alpha=0.6,
-                    label='Fronteira de Pareto (dist_cdor × tempo)')
-        plt.title("Pareto (|correct_detected_outliers_rate – 0.1| vs tempo)")
+                    label='Fronteira de Pareto (obj1 × obj5)')
+        plt.title("Pareto (|cdor–0.1| vs Tempo total)")
         plt.xlabel("|correct_detected_outliers_rate – 0.1| (a minimizar)")
         plt.ylabel("Tempo total (s) (a minimizar)")
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
-        plt.savefig("fronteira_pareto_multiobjetivo.png")
+        plt.savefig("pareto_3objetivos.png")
         plt.show()
     else:
-        print("Nenhum resultado para plotar a fronteira de Pareto.")
-
-    # Exemplos: Melhor indivíduo por objetivo isolado (objetivo 1 e 5, só para demonstração)
-    if not df_results_mo.empty:
-        best_cdor = df_results_mo.loc[df_results_mo['obj1_cdor_dist_to_0.1'].idxmin()]
-        print("\nIndivíduo com |cdor – 0.1| menor (objetivo 1):")
-        print(best_cdor.to_dict())
-
-        best_time = df_results_mo.loc[df_results_mo['obj5_time'].idxmin()]
-        print("\nIndivíduo com menor tempo (objetivo 5):")
-        print(best_time.to_dict())
+        print("Nenhum resultado para plotar.")

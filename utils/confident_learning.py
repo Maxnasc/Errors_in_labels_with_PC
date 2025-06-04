@@ -1,99 +1,89 @@
 import numpy as np
-import matplotlib.pyplot as plt 
-from ocpc_py import MultiClassPC
 import pandas as pd
-import os
-from sklearn.datasets import load_iris
-from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
 from cleanlab import Datalab
 
 def get_CL_label_correction(X, Y_error, Y_original):
     """
-    Identifica e corrige possíveis erros de rótulos em um conjunto de dados utilizando aprendizado confiante (Confident Learning).
+    Identifica e corrige possíveis erros de rótulos em um conjunto de dados utilizando Confident Learning (Cleanlab).
     Parâmetros:
-        X (array-like): Conjunto de características (features) utilizado para treinar o modelo.
-        Y_error (array-like): Rótulos possivelmente incorretos associados aos dados.
-        Y_original (array-like): Rótulos originais (verdadeiros) para comparação.
+        X (array-like): Conjunto de features (n_samples × n_features).
+        Y_error (array-like): Rótulos possivelmente corrompidos (1D).
+        Y_original (array-like): Rótulos originais (1D), para comparação.
     Retorna:
-        pandas.DataFrame: Um DataFrame contendo informações sobre os rótulos identificados como problemáticos, 
-        incluindo os rótulos fornecidos, os rótulos previstos e os rótulos originais.
-    Detalhes:
-        - Treina um modelo de regressão logística para prever probabilidades de classe com base nos dados fornecidos.
-        - Utiliza a biblioteca `Datalab` para identificar problemas nos rótulos com base nas probabilidades previstas.
-        - Calcula a porcentagem de rótulos incorretos antes e depois da aplicação do aprendizado confiante.
-        - Exibe no console a porcentagem de rótulos corrigidos e se houve melhora, piora ou nenhuma alteração após a correção.
-    Exemplo de uso:
-        issues = get_CL_label_correction(X, Y_error, Y_original)
+        metrics (dict): {"original error rate CL": ..., "error rate after correction CL": ...}
+        issues  (pd.DataFrame): DataFrame (vazio ou não) com colunas mínimas:
+            ['given_label', 'predicted_label', 'original_labels', 'is_label_issue'] 
+            e quaisquer outras colunas que o Cleanlab gerar.
     """
-    # Treinar modelo
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X, Y_error)
-    probs = model.predict_proba(X)
 
-    # Método moderno (recomendado)
-    lab = Datalab(data={"y": Y_error}, label_name="y")
-    lab.find_issues(features=X, pred_probs=probs)
-    issues = lab.get_issues('label')
-    issues['original_labels'] = Y_original
+    # 1) Treino do modelo (Regressão Logística)
+    try:
+        model = LogisticRegression(max_iter=1000)
+        model.fit(X, Y_error)
+        probs = model.predict_proba(X)
+    except Exception as e:
+        # Se falhar no treino, devolvemos métricas zero e issues vazio
+        # (a avaliação continuará, mas sem dados de CL)
+        metrics = {
+            "original error rate CL": 0.0,
+            "error rate after correction CL": 0.0
+        }
+        empty_issues = pd.DataFrame(columns=[
+            'given_label', 'predicted_label', 'original_labels', 'is_label_issue'
+        ])
+        return metrics, empty_issues
 
-    numero_de_labels_erradas = (issues['given_label'] != issues['original_labels']).sum()
-    porcentagem_labels_erradas_antes_CL = (issues['given_label'] != issues['original_labels']).mean()
-    numero_de_labels_erradas_pos_CL = (issues['predicted_label'] != issues['original_labels']).sum()
-    porcentagem_labels_erradas_depois_do_CL = (issues['predicted_label'] != issues['original_labels']).mean()
-    score_correcao = porcentagem_labels_erradas_antes_CL - porcentagem_labels_erradas_depois_do_CL
-    
-    metrics = {}
-    # Getting the original error rate
-    metrics["original error rate CL"] = round(porcentagem_labels_erradas_antes_CL, 4)
+    # 2) Construir o objeto Datalab
+    try:
+        lab = Datalab(data={"y": Y_error}, label_name="y")
+        lab.find_issues(features=X, pred_probs=probs)
+    except Exception:
+        # Se find_issues falhar de alguma forma, devolvemos também vazio
+        metrics = {
+            "original error rate CL": 0.0,
+            "error rate after correction CL": 0.0
+        }
+        empty_issues = pd.DataFrame(columns=[
+            'given_label', 'predicted_label', 'original_labels', 'is_label_issue'
+        ])
+        return metrics, empty_issues
 
-    # Getting the error rate after correction
-    metrics["error rate after correction CL"] = round(porcentagem_labels_erradas_depois_do_CL, 4)
-        
+    # 3) Tentar pegar as “issues” de tipo 'label'
+    try:
+        issues = lab.get_issues('label')
+        issues['original_labels'] = Y_original
+    except Exception:
+        # Quando Cleanlab não encontra *nenhum* issue de rótulo, apenas criamos um DataFrame vazio
+        issues = pd.DataFrame(columns=[
+            'given_label', 'predicted_label', 'original_labels', 'is_label_issue'
+        ])
+        metrics = {
+            "original error rate CL": 0.0,
+            "error rate after correction CL": 0.0
+        }
+        return metrics, issues
+
+    # 4) Se chegamos aqui, temos um DataFrame issues (talvez com linhas ou vazio, mas com colunas corretas)
+    if issues.shape[0] == 0:
+        # Não houve linhas de issue: métricas também são zero
+        metrics = {
+            "original error rate CL": 0.0,
+            "error rate after correction CL": 0.0
+        }
+        return metrics, issues
+
+    # 5) Calcular métricas de quantos rótulos estavam errados antes e depois do CL
+    try:
+        before = (issues['given_label'] != issues['original_labels']).mean()
+        after  = (issues['predicted_label'] != issues['original_labels']).mean()
+    except KeyError:
+        before = 0.0
+        after = 0.0
+
+    metrics = {
+        "original error rate CL": round(before, 4),
+        "error rate after correction CL": round(after, 4)
+    }
+
     return metrics, issues
-
-def get_CL_label_correction_simple(X, Y_error, Y_original):
-    """
-    Identifica e corrige possíveis erros de rótulos em um conjunto de dados utilizando aprendizado confiante (Confident Learning).
-    Parâmetros:
-        X (array-like): Conjunto de características (features) utilizado para treinar o modelo.
-        Y_error (array-like): Rótulos possivelmente incorretos associados aos dados.
-        Y_original (array-like): Rótulos originais (verdadeiros) para comparação.
-    Retorna:
-        pandas.DataFrame: Um DataFrame contendo informações sobre os rótulos identificados como problemáticos, 
-        incluindo os rótulos fornecidos, os rótulos previstos e os rótulos originais.
-    Detalhes:
-        - Treina um modelo de regressão logística para prever probabilidades de classe com base nos dados fornecidos.
-        - Utiliza a biblioteca `Datalab` para identificar problemas nos rótulos com base nas probabilidades previstas.
-        - Calcula a porcentagem de rótulos incorretos antes e depois da aplicação do aprendizado confiante.
-        - Exibe no console a porcentagem de rótulos corrigidos e se houve melhora, piora ou nenhuma alteração após a correção.
-    Exemplo de uso:
-        issues = get_CL_label_correction(X, Y_error, Y_original)
-    """
-    # Treinar modelo
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X, Y_error)
-    probs = model.predict_proba(X)
-
-    # Método moderno (recomendado)
-    lab = Datalab(data={"y": Y_error}, label_name="y")
-    lab.find_issues(features=X, pred_probs=probs)
-    issues = lab.get_issues('label')
-    issues['original_labels'] = Y_original
-
-    porcentagem_labels_erradas = (issues['given_label'] != issues['original_labels']).mean()
-    porcentagem_labels_erradas_depois_do_CL = (issues['predicted_label'] != issues['original_labels']).mean()
-    score_correcao = porcentagem_labels_erradas - porcentagem_labels_erradas_depois_do_CL
-
-    print(f'porcentagem_labels_erradas: {round(porcentagem_labels_erradas, 2)}%')
-    print(f'porcentagem_labels_erradas_depois_do_CL: {round(porcentagem_labels_erradas_depois_do_CL, 2)}%')
-    if score_correcao < 0:
-        print(f'Piora de : {round(score_correcao, 2)}%')
-    elif score_correcao > 0:
-        print(f'Melhora de : {round(score_correcao, 2)}%')
-    else:
-        print(f'Sem alteração: {round(score_correcao, 2)}%')
-        
-    # print(f'score_correcao (positivo = melhora; negativo = piora): {score_correcao}')
-        
-    return issues

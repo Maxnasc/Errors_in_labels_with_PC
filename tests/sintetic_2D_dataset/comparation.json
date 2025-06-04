@@ -2,13 +2,13 @@
     "ocpc": {
         "correct_detected_outliers_rate": 0.009900990099009901,
         "wrong_detected_outliers_rate": 0.06435643564356436,
-        "correct_adjusted_errors_pc_rate": 0.07425742574257425,
-        "wrong_adjusted_errors_pc_rate": 0.024752475247524754
+        "correct_adjusted_errors_pc_rate": 0.0594059405940594,
+        "wrong_adjusted_errors_pc_rate": 0.039603960396039604
     },
     "CL": {
-        "correct_detected_outliers_rate": 0.024752475247524754,
-        "wrong_detected_outliers_rate": 0.07425742574257425,
-        "correct_adjusted_errors_pc_rate": 0.07425742574257425,
-        "wrong_adjusted_errors_pc_rate": 0.024752475247524754
+        "correct_detected_outliers_rate": 0.0,
+        "wrong_detected_outliers_rate": 0.0,
+        "correct_adjusted_errors_pc_rate": 0.0,
+        "wrong_adjusted_errors_pc_rate": 0.0
     }
 }

@@ -1,2 +1,2 @@
-,original error rate PC_LabelCorrection,error rate after correction PC_LabelCorrection,original error rate CL,error rate after correction CL
-0,0.1019,0.0281,0.0984,0.0492
+,ocpc,CL
+0,"{'correct_detected_outliers_rate': 0.0017574692442882249, 'wrong_detected_outliers_rate': 0.0210896309314587, 'correct_adjusted_errors_pc_rate': 0.03690685413005272, 'wrong_adjusted_errors_pc_rate': 0.061511423550087874}","{'correct_detected_outliers_rate': 0.0, 'wrong_detected_outliers_rate': 0.0, 'correct_adjusted_errors_pc_rate': 0.0, 'wrong_adjusted_errors_pc_rate': 0.0}"
