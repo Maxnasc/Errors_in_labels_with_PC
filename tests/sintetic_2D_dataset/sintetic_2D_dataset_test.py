@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
 from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from utils.confident_learning import get_CL_label_correction
-from utils.utils import calcula_novas_metricas, get_dataset_with_error, save_metrics_to_csv_file, save_metrics_to_json_file
+from utils.utils import get_dataset_with_error, save_metrics_to_csv_file, save_metrics_to_json_file
 import os
 from codecarbon import EmissionsTracker
 
 def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str, k_max: int, alfa: float, lamda: float, f: float):
     # tracker = EmissionsTracker(output_dir="tests/sintetic_2D_dataset/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
     # tracker.start()
-    lc = PC_LabelCorrector(path='sintetic_2D_dataset', detect_outlier_with_ocpc=outlier_detection_ocpc)
+    lc = PC_LabelCorrector(path='sintetic_2D_dataset', detect_outlier_with_ocpc=outlier_detection_ocpc, k_max=k_max, alfa=alfa, lamda=lamda, f=f)
     Y_adjusted = lc.run(X=data, Y=target)
     # tracker.stop()
     return Y_adjusted, lc.metrics
@@ -112,70 +112,50 @@ def test_2D_sintetic_dataset(path: str, k_max = int, alfa = float, lamda = float
         f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
     )
     
-    # # entender quais labels estão errados
-    # erros = [i for i, value in enumerate(Y) if value != data_with_error.get('target')[i]]
+    # entender quais labels estão errados
+    erros = [i for i, value in enumerate(Y) if value != data_with_error.get('target')[i]]
     
-    # if outlier_detection_OCPC:
-    #     caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_ocpc.json'
-    #     caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_ocpc.json'
-    # else:
-    #     caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_lof.json'
-    #     caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_lof.json'
+    if outlier_detection_OCPC:
+        caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_ocpc.json'
+        caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_ocpc.json'
+    else:
+        caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_lof.json'
+        caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_lof.json'
     
-    # with open(caminho_ouliers_pc, 'r') as opcl:
-    #     outliers_saved = json.load(opcl)    
+    with open(caminho_ouliers_pc, 'r') as opcl:
+        outliers_saved = json.load(opcl)    
         
-    # correct_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i in erros]
-    # wrong_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i not in erros]
+    correct_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i in erros]
+    wrong_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i not in erros]
     
-    # # Qual a porcentagem do erro que foi efetivamente corrigida ?
-    # erros_depois_de_corrigir = [i for i, value in enumerate(Y) if value != Y_adjusted_pc[i]]
+    correct_adjusted_errors_pc = [o for i, o in enumerate(Y_adjusted_pc) if i in erros and o == Y[i]]
+    wrong_adjusted_errors_pc = [o for i, o in enumerate(Y_adjusted_pc) if i in erros and o != Y[i]]    
+
+    correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label']==issues['original_labels'])]
+    wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label']!=issues['original_labels'])]
     
-    # erros_ajustados_corretamente = [i for i in erros if i not in erros_depois_de_corrigir]
-    # erros_nao_corrigidos = [i for i in erros if i in erros_depois_de_corrigir]
-    # novos_erros_gerados = [i for i in erros_depois_de_corrigir if i not in erros]  
-
-    # # Cálculos para resultado_outliers_CL, espelhando a lógica do OCPC
-    # issues['erro_original'] = issues['original_labels'] != data_with_error.get('target')
-    # issues['erro_apos_correcao'] = issues['original_labels'] != issues['predicted_label']
-
-    # erros_indices_CL = issues[issues['erro_original']].index.tolist()
-    # erros_depois_corrigir_indices_CL = issues[issues['erro_apos_correcao']].index.tolist()
-
-    # erros_ajustados_corretamente_CL = [i for i in erros_indices_CL if i not in erros_depois_corrigir_indices_CL]
-    # erros_nao_corrigidos_CL = [i for i in erros_indices_CL if i in erros_depois_corrigir_indices_CL]
-    # novos_erros_gerados_CL = [i for i in erros_depois_corrigir_indices_CL if i not in erros_indices_CL]
-
-    # correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label'] == issues['original_labels'])]
-    # wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label'] != issues['original_labels'])]
+    correct_adjusted_errors_CL = issues[issues['is_label_issue'] & (issues['predicted_label']==issues['original_labels'])]
+    wrong_adjusted_errors_CL = issues[issues['is_label_issue'] & (issues['predicted_label']!=issues['original_labels'])]
     
-    # resultado_outliers_ocpc = {
-    #     'taxa_de_erro_detectada_corretamente': len(correct_detected_outliers)/len(Y),
-    #     'taxa_de_erro_detectada_erradamente': len(wrong_detected_outliers)/len(Y),
-    #     'erros_de_rotulo_ajustados_corretamente': len(erros_ajustados_corretamente),
-    #     'taxa_do_erro_ajustada_corretamente': len(erros_ajustados_corretamente)/len(erros),
-    #     'taxa_do_erro_nao_corrigida': len(erros_nao_corrigidos)/len(erros),
-    #     'novos_erros_gerados': len(novos_erros_gerados)/len(erros),
-    #     'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': len(novos_erros_gerados)/len(Y),
-    # }
+    resultado_outliers_ocpc = {
+        'correct_detected_outliers_rate': len(correct_detected_outliers)/len(Y),
+        'wrong_detected_outliers_rate': len(wrong_detected_outliers)/len(Y),
+        'correct_adjusted_errors_pc_rate': len(correct_adjusted_errors_pc)/len(Y),
+        'wrong_adjusted_errors_pc_rate': len(wrong_adjusted_errors_pc)/len(Y),
+    }
     
-    # resultado_outliers_CL = {
-    #     'taxa_de_erro_detectada_corretamente': correct_outliers_detected_CL.shape[0] / len(Y),
-    #     'taxa_de_erro_detectada_erradamente': wrong_false_alarm_CL.shape[0] / len(Y),
-    #     'erros_de_rotulo_ajustados_corretamente': len(erros_ajustados_corretamente_CL),
-    #     'taxa_do_erro_ajustada_corretamente': len(erros_ajustados_corretamente_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
-    #     'taxa_do_erro_nao_corrigida': len(erros_nao_corrigidos_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
-    #     'novos_erros_gerados': len(novos_erros_gerados_CL) if erros_indices_CL else 0,
-    #     'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': len(novos_erros_gerados_CL) / len(Y) if erros_indices_CL else 0,
-    # }
+    resultado_outliers_CL = {
+        'correct_detected_outliers_rate': correct_outliers_detected_CL.shape[0]/len(Y),
+        'wrong_detected_outliers_rate': wrong_false_alarm_CL.shape[0]/len(Y),
+        'correct_adjusted_errors_pc_rate': correct_adjusted_errors_CL.shape[0]/len(Y),
+        'wrong_adjusted_errors_pc_rate': wrong_adjusted_errors_CL.shape[0]/len(Y),
+    }
         
-    # with open(caminho_ocpc, "w") as f:
-    #     json.dump(resultado_outliers_ocpc, f, indent=4)
+    with open(caminho_ocpc, "w") as f:
+        json.dump(resultado_outliers_ocpc, f, indent=4)
         
-    # with open('tests/sintetic_2D_dataset/outliers_result_cl.json', "w") as f:
-    #     json.dump(resultado_outliers_CL, f, indent=4)
-    
-    resultado_outliers_ocpc, resultado_outliers_CL = calcula_novas_metricas(path=path, outlier_detection_OCPC=outlier_detection_OCPC, Y=Y, data_with_error=data_with_error, Y_adjusted_pc=Y_adjusted_pc, issues=issues)
+    with open('tests/sintetic_2D_dataset/outliers_result_cl.json', "w") as f:
+        json.dump(resultado_outliers_CL, f, indent=4)
 
     metrics = {
         "ocpc": resultado_outliers_ocpc,

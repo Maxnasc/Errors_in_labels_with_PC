@@ -1,4 +1,9 @@
 {
-    "correct_detected_outliers": 0.006666666666666667,
-    "wrong_detected_outliers": 0.06666666666666667
+    "taxa_de_erro_detectada_corretamente": 0.0056179775280898875,
+    "taxa_de_erro_detectada_erradamente": 0.0449438202247191,
+    "erros_de_rotulo_ajustados_corretamente": 3,
+    "taxa_do_erro_ajustada_corretamente": 0.1875,
+    "taxa_do_erro_nao_corrigida": 0.8125,
+    "novos_erros_gerados": 3,
+    "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.016853932584269662
 }

@@ -2,14 +2,14 @@ import json
 from sklearn.datasets import load_iris
 from PC_LabelCorrector.PC_LabelCorrector import PC_LabelCorrector
 from utils.confident_learning import get_CL_label_correction
-from utils.utils import get_dataset_with_error, save_metrics_to_csv_file
+from utils.utils import calcula_novas_metricas, get_dataset_with_error, save_metrics_to_csv_file
 import os
 from codecarbon import EmissionsTracker
 
 def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str, k_max = int, alfa = float, lamda = float, f = float):
     # tracker = EmissionsTracker(output_dir="tests/load_iris/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
     # tracker.start()
-    lc = PC_LabelCorrector(path='load_iris', detect_outlier_with_ocpc=outlier_detection_ocpc, k_max=k_max, alfa=alfa, lamda=lamda, f=f)
+    lc = PC_LabelCorrector(path='load_iris', detect_outlier_with_ocpc=outlier_detection_ocpc)
     Y_adjusted = lc.run(X=data, Y=target)
     # tracker.stop()
     return Y_adjusted, lc.metrics
@@ -46,50 +46,7 @@ def test_load_iris_dataset(path: str, k_max = int, alfa = float, lamda = float, 
         f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
     )
     
-    # entender quais labels estão errados
-    erros = [i for i, value in enumerate(data.get('target')) if value != data_with_error.get('target')[i]]
-    
-    if outlier_detection_OCPC:
-        caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_ocpc.json'
-        caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_ocpc.json'
-    else:
-        caminho_ouliers_pc = 'tests/sintetic_2D_dataset/outliers_lof.json'
-        caminho_ocpc = 'tests/sintetic_2D_dataset/outliers_result_lof.json'
-    
-    with open(caminho_ouliers_pc, 'r') as opcl:
-        outliers_saved = json.load(opcl)    
-        
-    correct_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i in erros]
-    wrong_detected_outliers = [o for i, o in enumerate(outliers_saved) if o == -1 and i not in erros]
-    
-    correct_adjusted_errors_pc = [o for i, o in enumerate(Y_adjusted_pc) if i in erros and o == data.get('target')[i]]
-    wrong_adjusted_errors_pc = [o for i, o in enumerate(Y_adjusted_pc) if i in erros and o != data.get('target')[i]]    
-
-    correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label']==issues['original_labels'])]
-    wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label']!=issues['original_labels'])]
-    
-    correct_adjusted_errors_CL = issues[issues['is_label_issue'] & (issues['predicted_label']==issues['original_labels'])]
-    wrong_adjusted_errors_CL = issues[issues['is_label_issue'] & (issues['predicted_label']!=issues['original_labels'])]
-    
-    resultado_outliers_ocpc = {
-        'correct_detected_outliers_rate': len(correct_detected_outliers)/len(data.get('target')),
-        'wrong_detected_outliers_rate': len(wrong_detected_outliers)/len(data.get('target')),
-        'correct_adjusted_errors_pc_rate': len(correct_adjusted_errors_pc)/len(data.get('target')),
-        'wrong_adjusted_errors_pc_rate': len(wrong_adjusted_errors_pc)/len(data.get('target')),
-    }
-    
-    resultado_outliers_CL = {
-        'correct_detected_outliers_rate': correct_outliers_detected_CL.shape[0]/len(data.get('target')),
-        'wrong_detected_outliers_rate': wrong_false_alarm_CL.shape[0]/len(data.get('target')),
-        'correct_adjusted_errors_pc_rate': correct_adjusted_errors_CL.shape[0]/len(data.get('target')),
-        'wrong_adjusted_errors_pc_rate': wrong_adjusted_errors_CL.shape[0]/len(data.get('target')),
-    }
-        
-    with open(caminho_ocpc, "w") as f:
-        json.dump(resultado_outliers_ocpc, f, indent=4)
-        
-    with open('tests/sintetic_2D_dataset/outliers_result_cl.json', "w") as f:
-        json.dump(resultado_outliers_CL, f, indent=4)
+    resultado_outliers_ocpc, resultado_outliers_CL = calcula_novas_metricas(path=path, outlier_detection_OCPC=outlier_detection_OCPC, Y=data.target, data_with_error=data_with_error, Y_adjusted_pc=Y_adjusted_pc, issues=issues)
 
     metrics = {
         "ocpc": resultado_outliers_ocpc,
@@ -103,5 +60,5 @@ def test_load_iris_dataset(path: str, k_max = int, alfa = float, lamda = float, 
     return metrics
 
 if __name__ == "__main__":
-    test_load_iris_dataset(outlier_detection_OCPC=True)
-    test_load_iris_dataset(outlier_detection_OCPC=False)
+    test_load_iris_dataset(path='load_iris', outlier_detection_OCPC=True)
+    test_load_iris_dataset(path='load_iris', outlier_detection_OCPC=False)

@@ -1,2 +1,2 @@
 ,ocpc,CL
-0,"{'correct_detected_outliers_rate': 0.013333333333333334, 'wrong_detected_outliers_rate': 0.07333333333333333, 'correct_adjusted_errors_pc_rate': 0.006666666666666667, 'wrong_adjusted_errors_pc_rate': 0.09333333333333334}","{'correct_detected_outliers_rate': 0.0, 'wrong_detected_outliers_rate': 0.0, 'correct_adjusted_errors_pc_rate': 0.0, 'wrong_adjusted_errors_pc_rate': 0.0}"
+0,"{'correct_detected_outliers_rate': 0.006666666666666667, 'wrong_detected_outliers_rate': 0.07333333333333333, 'correct_adjusted_errors_pc_rate': 0.07333333333333333, 'wrong_adjusted_errors_pc_rate': 0.02666666666666667}","{'correct_detected_outliers_rate': 0.02, 'wrong_detected_outliers_rate': 0.08, 'correct_adjusted_errors_pc_rate': 0.08, 'wrong_adjusted_errors_pc_rate': 0.02}"

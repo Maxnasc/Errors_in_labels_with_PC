@@ -1,6 +1,9 @@
 {
-    "correct_detected_outliers_rate": 0.0,
-    "wrong_detected_outliers_rate": 0.0,
-    "correct_adjusted_errors_pc_rate": 0.0,
-    "wrong_adjusted_errors_pc_rate": 0.0
+    "taxa_de_erro_detectada_corretamente": 0.0297029702970297,
+    "taxa_de_erro_detectada_erradamente": 0.0594059405940594,
+    "erros_de_rotulo_ajustados_corretamente": 18,
+    "taxa_do_erro_ajustada_corretamente": 0.9,
+    "taxa_do_erro_nao_corrigida": 0.1,
+    "novos_erros_gerados": 16,
+    "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.07920792079207921
 }
