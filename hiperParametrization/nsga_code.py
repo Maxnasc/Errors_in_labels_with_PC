@@ -10,23 +10,25 @@ from yaspin import yaspin
 from yaspin.spinners import Spinners
 import time
 
-# Importar as quatro funções de teste
+# Importar as quatro funções de teste (que retornam dicionário "ocpc" → {...})
 from tests.breast_cancer.breast_cancer import test_breast_cancer_dataset
 from tests.load_iris.load_iris import test_load_iris_dataset
 from tests.load_wine.load_wine import test_load_wine_dataset
 from tests.sintetic_2D_dataset.sintetic_2D_dataset import test_2D_sintetic_dataset
 
 # -------------------------------------------------------------------
-# 1. Criar as classes de Fitness e Individual para MULTI-OBJETIVOS (3 objetivos agora)
-#    Todos os três objetivos serão minimizados → pesos = -1.0 cada.
+# 1. Criar as classes de Fitness e Individual para MULTI-OBJETIVOS (3 objetivos)
+#    - obj1 (correções certas) → MAXIMIZAR → peso +1.0
+#    - obj2 (novos erros gerados) → MINIMIZAR → peso -1.0
+#    - obj3 (tempo total) → MINIMIZAR → peso -1.0
 if "Fitness3Obj" not in creator.__dict__:
-    creator.create("Fitness3Obj", base.Fitness, weights=(-1.0, -1.0, -1.0))
+    creator.create("Fitness3Obj", base.Fitness, weights=(1.0, -1.0, -1.0))
 
 if "Individual" not in creator.__dict__:
     creator.create("Individual", list, fitness=creator.Fitness3Obj)
 
 # -------------------------------------------------------------------
-# 2. Espaço de busca (quatro hiperparâmetros do PC_LabelCorrector)
+# 2. Espaço de busca: quatro hiperparâmetros do PC_LabelCorrector
 toolbox = base.Toolbox()
 toolbox.register("attr_k_max", random.randint, 2, 10)
 toolbox.register("attr_alfa", random.uniform, 0.1, 1.0)
@@ -55,11 +57,14 @@ test_functions = [
 def evaluate_individual(individual):
     """
     Cada indivíduo é [k_max, alfa, lamda, f].
-    Chamamos as quatro funções de teste, extraímos as métricas ocpc[…]
-    e montamos um vetor-fitness de 3 valores:
-        1) |avg_cdor – 0.1|     (obj1)
-        2) |avg_caer – 0.1|    (obj3)
-        3) total_time           (obj5)
+    Chamamos as quatro funções de teste e extraímos, do dicionário 'ocpc':
+      - correct_adjusted_errors_pc_rate  (correções certas)
+      - wrong_adjusted_errors_pc_rate    (novos erros gerados)
+    Além disso, computamos o tempo total somando cada execução.
+    Retornamos 3 valores (obj1, obj2, obj3) a serem passados ao Fitness:
+      obj1 = MÉDIA de 'correct_adjusted_errors_pc_rate'  → será MAXIMIZADO
+      obj2 = MÉDIA de 'wrong_adjusted_errors_pc_rate'    → será MINIMIZADO
+      obj3 = total_time                                  → será MINIMIZADO
     """
     try:
         k_max = int(individual[0])
@@ -67,8 +72,8 @@ def evaluate_individual(individual):
         lamda = float(individual[2])
         f     = float(individual[3])
 
-        sum_cdor = 0.0
-        sum_caer = 0.0
+        sum_correct_adjusted = 0.0
+        sum_wrong_generated  = 0.0
         total_time = 0.0
 
         n_tests = len(test_functions)
@@ -77,26 +82,31 @@ def evaluate_individual(individual):
             start_time = time.perf_counter()
             results_dict = test_func(path_str, k_max, alfa, lamda, f)
             end_time = time.perf_counter()
+
             elapsed = end_time - start_time
             total_time += elapsed
 
             ocpc = results_dict.get("ocpc", {})
-            sum_cdor += ocpc.get("correct_detected_outliers_rate", 0.0)
-            sum_caer += ocpc.get("correct_adjusted_errors_pc_rate", 0.0)
+            sum_correct_adjusted += ocpc.get("erros_de_rotulo_ajustados_corretamente", 0.0)
+            sum_wrong_generated  += ocpc.get("novos_erros_gerados",   0.0)
 
-        avg_cdor = sum_cdor / n_tests
-        avg_caer = sum_caer / n_tests
+        avg_correct = sum_correct_adjusted / n_tests
+        avg_wrong   = sum_wrong_generated  / n_tests
 
-        obj1 = abs(avg_cdor - 0.1)
-        obj3 = abs(avg_caer - 0.1)
-        obj5 = total_time
+        # OBJETIVOS:
+        obj1 = avg_correct   # maximizar
+        obj2 = avg_wrong     # minimizar
+        obj3 = total_time    # minimizar
 
-        return (obj1, obj3, obj5)
+        return (obj1, obj2, obj3)
 
     except Exception as e:
-        # Se falhar, penaliza com valores grandes
+        # Caso dê erro na avaliação, penaliza:
+        # Para OBJ1 (maximizar) → retornamos um valor baixo (0.0)
+        # Para OBJ2 (minimizar) → retornamos um valor alto (1.0)
+        # Para OBJ3 (tempo) → retornamos um valor alto (1e3)
         print(f"[ERROR] Avaliação falhou para indivíduo {individual}: {e}")
-        return (1.0, 1.0, 1e3)
+        return (0.0, 1.0, 1e3)
 
 # -------------------------------------------------------------------
 # 5. Função de mutação (com limites nos parâmetros)
@@ -174,9 +184,10 @@ if __name__ == "__main__":
             'alfa': float(ind[1]),
             'lamda': float(ind[2]),
             'f': float(ind[3]),
-            'obj1_cdor_dist_to_0.1': ind.fitness.values[0],
-            'obj3_caer_dist_to_0.1': ind.fitness.values[1],
-            'obj5_time': ind.fitness.values[2]
+            # Os 3 valores de fitness retornados:
+            'erros_corretos_medios': ind.fitness.values[0],   # a maximizar
+            'novos_erros_medios':   ind.fitness.values[1],   # a minimizar
+            'tempo_total':          ind.fitness.values[2]    # a minimizar
         })
 
     df_results = pd.DataFrame(all_pareto_points)
@@ -186,11 +197,11 @@ if __name__ == "__main__":
     df_results.to_csv("resultados_pareto_3objetivos.csv", index=False)
     print("✅ Fronteira de Pareto salva em 'resultados_pareto_3objetivos.csv'.")
 
-    # 4. Calcular soma ponderada (pesos: obj1→1.0, obj3→1.5, obj5→1.2)
+    # 4. Calcular soma ponderada (pesos: obj1→1.5, obj2→1.0, obj3→1.2)
     df_results['weighted_sum'] = (
-        1.0 * df_results['obj1_cdor_dist_to_0.1'] +
-        1.5 * df_results['obj3_caer_dist_to_0.1'] +
-        1.2 * df_results['obj5_time']
+        1.5 * df_results['erros_corretos_medios'] +
+        1.0 * df_results['novos_erros_medios']   +
+        1.2 * df_results['tempo_total']
     )
 
     # 5. Identificar melhor indivíduo global (menor weighted_sum)
@@ -202,20 +213,20 @@ if __name__ == "__main__":
     df_best.to_csv("hiperParametrization/best-subject.csv", index=False)
     print(f"✅ Melhor indivíduo salvo em 'hiperParametrization/best-subject.csv'.")
 
-    # 7. (Opcional) Plotar Pareto (obj1 × obj5)
+    # 7. (Opcional) Plotar Pareto (erros_corretos_medios × tempo_total)
     if not df_results.empty:
         plt.figure(figsize=(8, 6))
-        plt.scatter(df_results['obj1_cdor_dist_to_0.1'],
-                    df_results['obj5_time'],
+        plt.scatter(df_results['erros_corretos_medios'],
+                    df_results['tempo_total'],
                     c='blue', alpha=0.6,
-                    label='Fronteira de Pareto (obj1 × obj5)')
-        plt.title("Pareto (|cdor–0.1| vs Tempo total)")
-        plt.xlabel("|correct_detected_outliers_rate – 0.1| (a minimizar)")
-        plt.ylabel("Tempo total (s) (a minimizar)")
+                    label='Fronteira (erros_corretos × tempo)')
+        plt.title("Pareto (erros corretos ajustados vs tempo total)")
+        plt.xlabel("erros_corretos_medios (a maximizar)")
+        plt.ylabel("tempo_total (a minimizar)")
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
-        plt.savefig("pareto_3objetivos.png")
+        plt.savefig("pareto_erros_vs_tempo.png")
         plt.show()
     else:
         print("Nenhum resultado para plotar.")

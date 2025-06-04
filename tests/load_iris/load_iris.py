@@ -9,7 +9,7 @@ from codecarbon import EmissionsTracker
 def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str, k_max = int, alfa = float, lamda = float, f = float):
     # tracker = EmissionsTracker(output_dir="tests/load_iris/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
     # tracker.start()
-    lc = PC_LabelCorrector(path='load_iris', detect_outlier_with_ocpc=outlier_detection_ocpc)
+    lc = PC_LabelCorrector(path='load_iris', detect_outlier_with_ocpc=outlier_detection_ocpc, k_max=k_max, alfa=alfa, lamda=lamda, f=f)
     Y_adjusted = lc.run(X=data, Y=target)
     # tracker.stop()
     return Y_adjusted, lc.metrics
