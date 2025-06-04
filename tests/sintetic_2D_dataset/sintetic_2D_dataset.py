@@ -90,7 +90,7 @@ def test_2D_sintetic_dataset(path: str, k_max = int, alfa = float, lamda = float
     erro_proposto = 0.1
     data_with_error = get_dataset_with_error(X, Y, erro_proposto)
     
-    plot_outliers(X, Y, data_with_error) # PLOTA OUTLIERS
+    # plot_outliers(X, Y, data_with_error) # PLOTA OUTLIERS
 
     labels_wrong_before = sum(1 for i in range(len(Y)) if data_with_error["target"][i] != Y[i])
     print(f"Rótulos errados antes do ajuste: {labels_wrong_before}")

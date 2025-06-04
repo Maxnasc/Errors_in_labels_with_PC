@@ -180,33 +180,35 @@ def run_nsga2_parallel(seed=None):
 
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
-    freeze_support()  # Para Windows + multiprocessing
+    freeze_support()  # continua presente apenas para Windows, mas não há Pool
 
     total_runs = 5
     all_pareto_points = []
 
-    # Configurar Pool de processos ANTES de registrar map na toolbox
-    with Pool(processes=max(1, cpu_count() - 1)) as pool:
-        toolbox.register("map", pool.map)
+    # **NÃO USAR Pool nem registrar toolbox.map**
+    # Ou seja, não há:
+    #   with Pool(...) as pool:
+    #       toolbox.register("map", pool.map)
+    #       ...
+    #
+    # Em vez disso, tudo roda de forma sequencial:
 
-        for run_idx in tqdm(range(total_runs), desc="Executando runs do NSGA-II"):
-            pareto = run_nsga2_parallel(seed=run_idx)
+    for run_idx in tqdm(range(total_runs), desc="Executando runs do NSGA-II"):
+        pareto = run_nsga2_parallel(seed=run_idx)
+        for ind in pareto:
+            all_pareto_points.append({
+                'k_max': int(ind[0]),
+                'alfa': float(ind[1]),
+                'lamda': float(ind[2]),
+                'f': float(ind[3]),
+                'obj1_cdor_dist_to_0.1': ind.fitness.values[0],
+                'obj2_wdor': ind.fitness.values[1],
+                'obj3_caer_dist_to_0.1': ind.fitness.values[2],
+                'obj4_waer': ind.fitness.values[3],
+                'obj5_time': ind.fitness.values[4]
+            })
 
-            # Para cada indivíduo da fronteira de Pareto, salvar parâmetros + fitness
-            for ind in pareto:
-                all_pareto_points.append({
-                    'k_max': int(ind[0]),
-                    'alfa': float(ind[1]),
-                    'lamda': float(ind[2]),
-                    'f': float(ind[3]),
-                    'obj1_cdor_dist_to_0.1': ind.fitness.values[0],
-                    'obj2_wdor': ind.fitness.values[1],
-                    'obj3_caer_dist_to_0.1': ind.fitness.values[2],
-                    'obj4_waer': ind.fitness.values[3],
-                    'obj5_time': ind.fitness.values[4]
-                })
-
-    # Salvar resultados em CSV
+    # Salvar CSV e plotar, etc. (mesmo de antes)
     df_results_mo = pd.DataFrame(all_pareto_points)
     df_results_mo.to_csv("resultados_otimizacao_ga_multiobjetivo.csv", index=False)
     print("\n✅ Otimização multiobjetivo concluída! (CSV gerado)")
