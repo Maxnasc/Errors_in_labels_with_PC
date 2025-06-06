@@ -115,10 +115,10 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
 
     # Executando os testes com PC_LabelCorrector (OCPC = True) e rastreando emissões
     print("Executando testes com PC_LabelCorrector...")
-    try:
-        global_metrics_PC['metric_2D'] = [run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=True, method_name="PC_2D") for i in range(n_samples)]
-    except Exception as e:
-        global_metrics_PC['metric_2D'] = {"Erro": str(e)}
+    # try:
+    #     global_metrics_PC['metric_2D'] = [run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=True, method_name="PC_2D") for i in range(n_samples)]
+    # except Exception as e:
+        # global_metrics_PC['metric_2D'] = {"Erro": str(e)}
 
     # try:
     #     global_metrics_PC['metric_breast_cancer'] = [run_and_track_emissions(test_breast_cancer_dataset, outlier_detection_ocpc=True, method_name="PC_breast_cancer") for i in range(n_samples)]
@@ -145,43 +145,43 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     # except Exception as e:
     #     global_metrics_PC['metric_load_wine'] = {"Erro": str(e)}
 
-    global_metrics_PC = get_statistics(calculate_mean_of_samples(global_metrics_PC), '_OCPC')
+    # global_metrics_PC = get_statistics(calculate_mean_of_samples(global_metrics_PC), '_OCPC')
 
     #####################################################################
 
     # # Executando os testes com LOF (OCPC = False) e rastreando emissões
-    # print("Executando testes com Confident Learning (LOF)...")
-    # try:
-    #     global_metrics_LOF['metric_2D'] = [run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=False, method_name="CL_2D") for i in range(n_samples)]
-    # except Exception as e:
-    #     global_metrics_LOF['metric_2D'] = {"Erro": str(e)}
+    print("Executando testes com Confident Learning (LOF)...")
+    try:
+        global_metrics_LOF['metric_2D'] = [run_and_track_emissions(test_2D_sintetic_dataset, outlier_detection_ocpc=False, method_name="CL_2D") for i in range(n_samples)]
+    except Exception as e:
+        global_metrics_LOF['metric_2D'] = {"Erro": str(e)}
+
+    try:
+        global_metrics_LOF['metric_breast_cancer'] = [run_and_track_emissions(test_breast_cancer_dataset, outlier_detection_ocpc=False, method_name="CL_breast_cancer") for i in range(n_samples)]
+    except Exception as e:
+        global_metrics_LOF['metric_breast_cancer'] = {"Erro": str(e)}
 
     # try:
-    #     global_metrics_LOF['metric_breast_cancer'] = [run_and_track_emissions(test_breast_cancer_dataset, outlier_detection_ocpc=False, method_name="CL_breast_cancer") for i in range(n_samples)]
+    #     global_metrics_LOF['metric_digits'] = run_and_track_emissions(test_digits_dataset, outlier_detection_ocpc=False, method_name="CL_digits")
     # except Exception as e:
-    #     global_metrics_LOF['metric_breast_cancer'] = {"Erro": str(e)}
-
-    # # try:
-    # #     global_metrics_LOF['metric_digits'] = run_and_track_emissions(test_digits_dataset, outlier_detection_ocpc=False, method_name="CL_digits")
-    # # except Exception as e:
-    # #     global_metrics_LOF['metric_digits'] = {"Erro": str(e)}
-
-    # # try:
-    # #     global_metrics_LOF['metric_linnerud'] = run_and_track_emissions(test_linnerud_dataset, outlier_detection_ocpc=False, method_name="CL_linnerud")
-    # # except Exception as e:
-    # #     global_metrics_LOF['metric_linnerud'] = {"Erro": str(e)}
+    #     global_metrics_LOF['metric_digits'] = {"Erro": str(e)}
 
     # try:
-    #     global_metrics_LOF['metric_load_iris'] = [run_and_track_emissions(test_load_iris_dataset, outlier_detection_ocpc=False, method_name="CL_load_iris") for i in range(n_samples)]
+    #     global_metrics_LOF['metric_linnerud'] = run_and_track_emissions(test_linnerud_dataset, outlier_detection_ocpc=False, method_name="CL_linnerud")
     # except Exception as e:
-    #     global_metrics_LOF['metric_load_iris'] = {"Erro": str(e)}
+    #     global_metrics_LOF['metric_linnerud'] = {"Erro": str(e)}
 
-    # try:
-    #     global_metrics_LOF['metric_load_wine'] = [run_and_track_emissions(test_load_wine_dataset, outlier_detection_ocpc=False, method_name="CL_load_wine") for i in range(n_samples)]
-    # except Exception as e:
-    #     global_metrics_LOF['metric_load_wine'] = {"Erro": str(e)}
+    try:
+        global_metrics_LOF['metric_load_iris'] = [run_and_track_emissions(test_load_iris_dataset, outlier_detection_ocpc=False, method_name="CL_load_iris") for i in range(n_samples)]
+    except Exception as e:
+        global_metrics_LOF['metric_load_iris'] = {"Erro": str(e)}
 
-    # global_metrics_LOF = get_statistics(calculate_mean_of_samples(global_metrics_LOF), '_CL')
+    try:
+        global_metrics_LOF['metric_load_wine'] = [run_and_track_emissions(test_load_wine_dataset, outlier_detection_ocpc=False, method_name="CL_load_wine") for i in range(n_samples)]
+    except Exception as e:
+        global_metrics_LOF['metric_load_wine'] = {"Erro": str(e)}
+
+    global_metrics_LOF = get_statistics(calculate_mean_of_samples(global_metrics_LOF), '_CL')
 
     #####################################################################
 
@@ -232,8 +232,8 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
 
         df_pivot.to_excel('tests/correcoes_resultantes.xlsx')
 
-    dict_to_csv_file(nome_arquivo_csv=f'{path}_PC.csv', data=global_metrics_PC)
-    # dict_to_csv_file(nome_arquivo_csv=f'{path}_LOF.csv', data=global_metrics_LOF)
+    # dict_to_csv_file(nome_arquivo_csv=f'{path}_PC.csv', data=global_metrics_PC)
+    dict_to_csv_file(nome_arquivo_csv=f'{path}_LOF.csv', data=global_metrics_LOF)
 
     # Flatten the global_metrics dictionary
     flattened_data = []
@@ -285,18 +285,17 @@ def get_emmisions_metric():
     
     
     # Remove linhas com NaNs nas colunas desejadas
-    df_limpo = df_emissions_cl.dropna(subset=colunas)
+    df_limpo_cl = df_emissions_cl.dropna(subset=colunas)
     # Converte essas colunas para tipo numérico (coercivo: transforma strings inválidas em NaN)
-    df_limpo[colunas] = df_limpo[colunas].apply(pd.to_numeric, errors='coerce')
+    df_limpo_cl[colunas] = df_limpo_cl[colunas].apply(pd.to_numeric, errors='coerce')
     # Remove quaisquer novos NaNs gerados pela conversão
-    df_limpo = df_limpo.dropna(subset=colunas)
+    df_limpo_cl = df_limpo_cl.dropna(subset=colunas)
     # Calcula a média e transforma em linha de DataFrame
-    df_ocpc = df_limpo[colunas].mean().to_frame().T
-    df_cl.insert(loc=0, column='metodo', value='ocpc')
+    df_cl = df_limpo_cl[colunas].mean().to_frame().T
+    df_cl.insert(loc=0, column='metodo', value='CL')
     
     df_emissions = pd.concat([df_ocpc, df_cl], ignore_index=True)
     df_emissions.to_excel('tests/emissoes_resultantes.xlsx')
-    a=1
 
 if __name__=="__main__":
     get_metrics_from_two_outlier_detection_method(n_samples=1)

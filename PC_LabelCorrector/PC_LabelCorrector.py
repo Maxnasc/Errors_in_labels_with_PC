@@ -7,6 +7,7 @@ from sklearn.datasets import load_iris
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import StandardScaler
 import os
+import pickle
 
 from utils.confident_learning import get_CL_label_correction
 from utils.utils import get_dataset_with_error, save_metrics_to_json_file
@@ -59,11 +60,16 @@ class PC_LabelCorrector:
             Dictionary with data separated by class
         """
         x_separated = {}
-
-        for i in range(len(X)):
-            if Y[i] not in x_separated:
-                x_separated[Y[i]] = {"X": []}
-            x_separated[Y[i]]["X"].append(np.array(X[i]))
+        for k in np.unique(Y):
+            classe_ = str(int(k))
+            x_separated[classe_] = X[Y == int(k)]
+            del classe_
+        ##
+        
+        # for i in range(len(X)):
+        #     if Y[i] not in x_separated:
+        #         x_separated[Y[i]] = {"X": np.ndarray([])}
+        #     x_separated[Y[i]]["X"].append(np.array(X[i]))
 
         return x_separated
 
@@ -77,37 +83,105 @@ class PC_LabelCorrector:
         Returns:
             Dictionary with identified inliers and outliers
         """
-        result = x_separated.copy()
+        result = {}
         for class_label, X in x_separated.items():
             if self.detect_outlier_with_ocpc:
-                preditc, scores = self._detect_outliers_ocpc(np.array(X["X"]))
+                preditc, scores = self._detect_outliers_ocpc(np.array(X))
             else:
-                preditc, scores = self._detect_outliers_lof(X["X"])
-            X["x_inliers"] = np.array(
-                [x for i, x in enumerate(X["X"]) if preditc[i] == 1]
-            )
-            X["x_outliers"] = np.array(
-                [x for i, x in enumerate(X["X"]) if preditc[i] == -1]
-            )
-            X['predict'] = preditc
+                preditc, scores = self._detect_outliers_lof(X)
+            # X["x_inliers"] = np.array(
+            #     [x for i, x in enumerate(X) if preditc[i] == 1]
+            # )
+            result[class_label] = {}
+            result[class_label]["x_inliers"] = X[preditc==1]
+            result[class_label]["x_outliers"] = X[preditc==-1]
+            result[class_label]['predict'] = preditc
         return result
 
+    # def _detect_outliers_lof(self, X):
+    #     """
+    #     Applies the Local Outlier Factor (LOF) to detect outliers.
+
+    #     Args:
+    #         X: Data for outlier detection
+
+    #     Returns:
+    #         Tuple with predictions and scores
+    #     """
+    #     lof = LocalOutlierFactor(
+    #         n_neighbors=int(len(X)/2), contamination=self.contamination
+    #     )
+    #     y_pred = lof.fit_predict(X)
+    #     scores = lof.negative_outlier_factor_
+        
+    #     # Apenas para dados 2D
+    #     if X.shape[1] == 2:
+    #         xx, yy = np.meshgrid(
+    #             np.linspace(X[:, 0].min() - 1, X[:, 0].max() + 1, 100),
+    #             np.linspace(X[:, 1].min() - 1, X[:, 1].max() + 1, 100),
+    #         )
+    #         grid = np.c_[xx.ravel(), yy.ravel()]
+    #         Z = lof.decision_function(grid)  # <- Aqui funciona
+    #         Z = Z.reshape(xx.shape)
+
+    #         plt.figure(figsize=(8, 6))
+    #         plt.contourf(xx, yy, Z, levels=np.linspace(Z.min(), Z.max(), 50), cmap=plt.cm.RdBu_r)
+    #         plt.colorbar(label='LOF Decision Function')
+    #         plt.scatter(X[:, 0], X[:, 1], c=y_pred, cmap=plt.cm.coolwarm, edgecolors='k')
+    #         plt.title("LOF Decision Boundary")
+    #         plt.xlabel("Feature 1")
+    #         plt.ylabel("Feature 2")
+    #         plt.show()
+        
+    #     return y_pred, scores
+    
     def _detect_outliers_lof(self, X):
         """
-        Applies the Local Outlier Factor (LOF) to detect outliers.
-
-        Args:
-            X: Data for outlier detection
-
-        Returns:
-            Tuple with predictions and scores
+        Detecta outliers com LOF e plota as regiões de decisão.
+        Pressupõe X com exatamente 2 features.
         """
+        # 1) LOF preparado para novelty detection
         lof = LocalOutlierFactor(
-            n_neighbors=int(len(X)/2), contamination=self.contamination
+            n_neighbors=int(len(X) / 2),
+            contamination=self.contamination,
+            novelty=True          # <- ponto crucial
         )
-        y_pred = lof.fit_predict(X)
-        scores = lof.negative_outlier_factor_
-        
+        lof.fit(X)                # 2) apenas fit
+
+        # 3) Predição/score para os próprios dados (opcional – só para colorir o scatter)
+        y_pred = lof.predict(X)                 # agora disponível
+        scores  = lof.negative_outlier_factor_  # sempre disponível para treino
+
+        # --- Plot da malha (grid) ---
+        if X.shape[1] == 2:                     # só faz sentido em 2D
+            # 4) Gera grid “novo” (não visto no fit)
+            xx, yy = np.meshgrid(
+                np.linspace(X[:, 0].min() - 1, X[:, 0].max() + 1, 300),
+                np.linspace(X[:, 1].min() - 1, X[:, 1].max() + 1, 300)
+            )
+            grid = np.c_[xx.ravel(), yy.ravel()]
+            # Usa decision_function no grid
+            Z = lof.decision_function(grid)
+            Z = Z.reshape(xx.shape)
+
+            plt.figure(figsize=(8, 6))
+            # Quanto maior Z, mais “normal” é o ponto
+            cs = plt.contourf(xx, yy, Z,
+                            levels=np.linspace(Z.min(), Z.max(), 50),
+                            cmap=plt.cm.RdBu_r)
+            plt.colorbar(cs, label="decision_function")
+            # pinta inliers/outliers do conjunto original
+            plt.scatter(X[:, 0], X[:, 1],
+                        c=y_pred,           # 1 = inlier, -1 = outlier
+                        cmap=plt.cm.coolwarm, edgecolors="k")
+            plt.title("Fronteira de decisão do LOF")
+            plt.xlabel("Feature 1")
+            plt.ylabel("Feature 2")
+            plt.tight_layout()
+            plt.savefig(f'tests/{self.path}/imagens/regiao de decisao LOF.png')
+            
+            # plt.show()
+
         return y_pred, scores
     
     def _detect_outliers_ocpc(self, X):
@@ -161,24 +235,28 @@ class PC_LabelCorrector:
         Returns:
             Dictionary with curves for each class
         """
+        a = x_separated.copy()
         result = x_separated.copy()
-        for class_label, X in result.items():
-            X["curve"] = self._get_OneClass_curve(X.get("x_inliers"))
+        for class_label, X in a.items():
+            result[class_label]["curve"] = self._get_OneClass_curve(X.get("x_inliers"))
             # Plotar a curva com os dados de inliers e outliers indicados
-            # fig, ax = plt.subplots()
-            # x_inliers = X.get("x_inliers")
-            # x_outliers = X.get("x_outliers")
-            # if x_inliers is not None and len(x_inliers) > 0:
-            #     if x_inliers.ndim == 2 and x_inliers.shape[1] >= 2:
-            #         ax.scatter(x_inliers[:, 0], x_inliers[:, 1], marker='o', label='Inliers')
-            #     else:
-            #         ax.scatter(np.arange(len(x_inliers)), x_inliers, marker='o', label='Inliers')
-            # if x_outliers is not None and len(x_outliers) > 0:
-            #     if x_outliers.ndim == 2 and x_outliers.shape[1] >= 2:
-            #         ax.scatter(x_outliers[:, 0], x_outliers[:, 1], marker='*', label='Outliers')
-            #     else:
-            #         ax.scatter(np.arange(len(x_outliers)), x_outliers, marker='*', label='Outliers')
-            # X["curve"].plot_curve(ax)
+            fig, ax = plt.subplots()
+            x_inliers = X.get("x_inliers")
+            x_outliers = X.get("x_outliers")
+            if x_inliers is not None and len(x_inliers) > 0:
+                if x_inliers.ndim == 2 and x_inliers.shape[1] >= 2:
+                    ax.scatter(x_inliers[:, 0], x_inliers[:, 1], marker='o', label='Inliers')
+                else:
+                    ax.scatter(np.arange(len(x_inliers)), x_inliers, marker='o', label='Inliers')
+            if x_outliers is not None and len(x_outliers) > 0:
+                if x_outliers.ndim == 2 and x_outliers.shape[1] >= 2:
+                    ax.scatter(x_outliers[:, 0], x_outliers[:, 1], marker='*', label='Outliers')
+                else:
+                    ax.scatter(np.arange(len(x_outliers)), x_outliers, marker='*', label='Outliers')
+            result[class_label]["curve"].plot_curve(ax)
+            plt.savefig(f'tests/{self.path}/imagens/classe_{class_label}.png')
+            
+        plt.show()
         return result
 
     def _identify_indexes_to_adjust(self, x_outlier_labeled, X):
@@ -368,12 +446,24 @@ class PC_LabelCorrector:
                 "contamination parameter should be in the [0, 0.5] range or 'auto'. Please try again with a different value for contamination"
             )
 
-        # Step 0: Normalizing X
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
+        # # Step 0: Normalizing X
+        # scaler = StandardScaler()
+        # X_scaled = scaler.fit_transform(X)
 
+        f = open('x.pkl', "wb")
+        pickle.dump(X, f)
+        f.close()
+        
+        f = open('y.pkl', "wb")
+        pickle.dump(Y, f)
+        f.close()
+        
         # Step 01: Separate X and Y according to each class
-        self.X_separated = self._separate_for_each_class(X=X_scaled, Y=Y)
+        self.X_separated = self._separate_for_each_class(X=X, Y=Y)
+        
+        for i, x in self.X_separated.items():
+            plt.scatter(x[:,0], x[:,1])
+            plt.title(f'X classe {i}')
 
         # Step 02: Find the inliers and outliers
         self.X_separated = self._separate_X_in_inliers_and_outliers(

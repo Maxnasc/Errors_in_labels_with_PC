@@ -9,19 +9,19 @@ import os
 from codecarbon import EmissionsTracker
 
 def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str, k_max: int, alfa: float, lamda: float, f: float):
-    tracker = EmissionsTracker(output_dir="tests/sintetic_2D_dataset/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
-    tracker.start()
+    # tracker = EmissionsTracker(output_dir="tests/sintetic_2D_dataset/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    # tracker.start()
     # lc = PC_LabelCorrector(path='sintetic_2D_dataset', detect_outlier_with_ocpc=outlier_detection_ocpc, k_max=k_max, alfa=alfa, lamda=lamda, f=f)
     lc = PC_LabelCorrector(path='sintetic_2D_dataset', detect_outlier_with_ocpc=outlier_detection_ocpc)
     Y_adjusted = lc.run(X=data, Y=target)
-    tracker.stop()
+    # tracker.stop()
     return Y_adjusted, lc.metrics
 
 def run_confident_learning(data, target, original_target, tracker_prefix: str):
-    tracker = EmissionsTracker(output_dir="tests/sintetic_2D_dataset/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
-    tracker.start()
+    # tracker = EmissionsTracker(output_dir="tests/sintetic_2D_dataset/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    # tracker.start()
     cl_issues, issues = get_CL_label_correction(data, target, original_target)
-    tracker.stop()
+    # tracker.stop()
     return cl_issues, issues
 
 def plot_outliers(X, Y, data_with_error):
@@ -70,18 +70,18 @@ def plot_outliers(X, Y, data_with_error):
     plt.show()
 
 def test_2D_sintetic_dataset(path = 'sintetic_2D_dataset', k_max = int, alfa = float, lamda = float, f = float, outlier_detection_OCPC=True):
-    x = np.linspace(-2, 2, num=101)
+    x = np.linspace(-2, 2, num=202)
     media_ruido = 0; 
-    var_ruido = 0.8
+    var_ruido = 0.1
     ruido = media_ruido + (var_ruido * np.random.randn(x.shape[0]))
-    y = x**2 # Ruido removido
+    y = x**2 + ruido # Ruido removido
 
     x = x[:,np.newaxis]; y = y[:,np.newaxis]
     c1 = np.concatenate((x,y), axis = 1)
     c1_out = np.zeros((c1.shape[0], 1))
 
-    xx = x + 2 
-    yy = -y + 6
+    xx = x + 2
+    yy = -y + 10
     c2 = np.concatenate((xx,yy), axis = 1)
     c2_out = np.ones((c2.shape[0], 1))
 
@@ -190,5 +190,5 @@ def test_2D_sintetic_dataset(path = 'sintetic_2D_dataset', k_max = int, alfa = f
     return metrics
 
 if __name__ == "__main__":
-    test_2D_sintetic_dataset(path='sintetic_2D_dataset', outlier_detection_OCPC=True)
+    # test_2D_sintetic_dataset(path='sintetic_2D_dataset', outlier_detection_OCPC=True)
     test_2D_sintetic_dataset(path='sintetic_2D_dataset', outlier_detection_OCPC=False)
