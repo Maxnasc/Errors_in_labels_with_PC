@@ -8,22 +8,23 @@ import os
 from codecarbon import EmissionsTracker
 
 def run_label_correction(data, target, outlier_detection_ocpc: bool, tracker_prefix: str, k_max = int, alfa = float, lamda = float, f = float):
-    # tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
-    # tracker.start()
-    lc = PC_LabelCorrector(path='breast_cancer', detect_outlier_with_ocpc=outlier_detection_ocpc, k_max=k_max, alfa=alfa, lamda=lamda, f=f)
+    tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    tracker.start()
+    # lc = PC_LabelCorrector(path='breast_cancer', detect_outlier_with_ocpc=outlier_detection_ocpc, k_max=k_max, alfa=alfa, lamda=lamda, f=f)
+    lc = PC_LabelCorrector(path='breast_cancer', detect_outlier_with_ocpc=outlier_detection_ocpc)
     # lc = PC_LabelCorrector(path='breast_cancer', detect_outlier_with_ocpc=outlier_detection_ocpc)
     Y_adjusted = lc.run(X=data, Y=target)
-    # tracker.stop()
+    tracker.stop()
     return Y_adjusted, lc.metrics
 
 def run_confident_learning(data, target, original_target, tracker_prefix: str):
-    # tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
-    # tracker.start()
+    tracker = EmissionsTracker(output_dir="tests/breast_cancer/codecarbon_emissions", output_file=f"emissions_{tracker_prefix}.csv")
+    tracker.start()
     cl_issues, issues = get_CL_label_correction(data, target, original_target)
-    # tracker.stop()
+    tracker.stop()
     return cl_issues, issues
 
-def test_breast_cancer_dataset(path: str, k_max = int, alfa = float, lamda = float, f = float, outlier_detection_OCPC=True):
+def test_breast_cancer_dataset(path='breast_cancer', k_max = int, alfa = float, lamda = float, f = float, outlier_detection_OCPC=True):
     data = load_breast_cancer()
     erro_proposto = 0.1
     data_with_error = get_dataset_with_error(data.data, data.target, erro_proposto)

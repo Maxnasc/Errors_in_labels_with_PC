@@ -1,9 +1,3 @@
-Métrica,original error rate PC_LabelCorrection,error rate after correction PC_LabelCorrection,original error rate CL,error rate after correction CL,before_fix_mean,before_fix_variance,before_fix_std,after_fix_mean,after_fix_variance,after_fix_std
-metric_2D,0.08517,0.05448,0.099,0.10098,,,,,,
-metric_breast_cancer,0.07803,0.03498,0.0984,0.04518,,,,,,
-metric_load_iris,0.057339999999999995,0.02333,0.1,0.06335,,,,,,
-metric_load_wine,0.06852,0.02192,0.0899,0.0309,,,,,,
-indices_PC_LabelCorrection_before_fix_OCPC,,,,,0.072265,0.00010913872500000003,0.010446948118948425,,,
-indices_CL_before_fix_OCPC,,,,,0.096825,1.6311875000000034e-05,0.004038796231552173,,,
-indices_PC_LabelCorrection_after_fix_OCPC,,,,,,,,0.022451666666666665,0.00036533034722222225,0.01911361680117665
-indices_CL_after_fix_OCPC,,,,,,,,0.04006833333333334,0.0012622328805555556,0.035527916918327136
+Métrica,taxa_de_erro_detectada_corretamente,taxa_de_erro_detectada_erradamente,erros_de_rotulo_ajustados_corretamente,taxa_do_erro_ajustada_corretamente,taxa_do_erro_nao_corrigida,novos_erros_gerados,taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original
+ocpc,"{'mean': 0.009900990099009901, 'variance': 0.0, 'std': 0.0}","{'mean': 0.04950495049504951, 'variance': 0.0, 'std': 0.0}","{'mean': 12.0, 'variance': 0.0, 'std': 0.0}","{'mean': 0.6, 'variance': 0.0, 'std': 0.0}","{'mean': 0.4, 'variance': 0.0, 'std': 0.0}","{'mean': 0.0, 'variance': 0.0, 'std': 0.0}","{'mean': 0.0, 'variance': 0.0, 'std': 0.0}"
+CL,"{'mean': 0.024752475247524754, 'variance': 0.0, 'std': 0.0}","{'mean': 0.0594059405940594, 'variance': 0.0, 'std': 0.0}","{'mean': 15.0, 'variance': 0.0, 'std': 0.0}","{'mean': 0.75, 'variance': 0.0, 'std': 0.0}","{'mean': 0.25, 'variance': 0.0, 'std': 0.0}","{'mean': 15.0, 'variance': 0.0, 'std': 0.0}","{'mean': 0.07425742574257425, 'variance': 0.0, 'std': 0.0}"

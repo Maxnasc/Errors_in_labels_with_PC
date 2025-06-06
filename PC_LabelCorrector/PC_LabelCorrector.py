@@ -5,6 +5,7 @@ import pandas as pd
 from ocpc_py import OneClassPC
 from sklearn.datasets import load_iris
 from sklearn.neighbors import LocalOutlierFactor
+from sklearn.preprocessing import StandardScaler
 import os
 
 from utils.confident_learning import get_CL_label_correction
@@ -14,7 +15,7 @@ os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
 class PC_LabelCorrector:
-    def __init__(self, path: str, detect_outlier_with_ocpc = True,  k_max = 2, alfa = 0.6574433592988927, lamda = 0.47730242380228527, close = False, buffer = 1000, f = 1.1414817386076277, 
+    def __init__(self, path: str, detect_outlier_with_ocpc = True,  k_max = 3, alfa = 0.44193457057360364, lamda = 0.42308144243616563, close = False, buffer = 1000, f = 0.5869388326294162, 
                  outlier_rate = 0.1):
         """
         Initializes the LabelCorrector with attributes to store state.
@@ -367,8 +368,12 @@ class PC_LabelCorrector:
                 "contamination parameter should be in the [0, 0.5] range or 'auto'. Please try again with a different value for contamination"
             )
 
+        # Step 0: Normalizing X
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
         # Step 01: Separate X and Y according to each class
-        self.X_separated = self._separate_for_each_class(X=X, Y=Y)
+        self.X_separated = self._separate_for_each_class(X=X_scaled, Y=Y)
 
         # Step 02: Find the inliers and outliers
         self.X_separated = self._separate_X_in_inliers_and_outliers(
@@ -405,50 +410,6 @@ class PC_LabelCorrector:
             json.dump(self.metrics, f, indent=4)
 
         print(f"Results saved to {path}")
-
-
-# >>>>>>>>>>>>>>>>>>>>> TEST ONLY <<<<<<<<<<<<<<<<<<<<<<<<<<
-
-
-# def get_dataset_with_error(data, erro_proposto):
-
-#     def alterar_rotulos(Y, percentual, random_state=None):
-#         """
-#         Alters the labels of Y by a given percentage.
-
-#         Args:
-#             Y: Original labels
-#             percentual: Percentage of labels to alter
-#             random_state: Seed for reproducibility
-
-#         Returns:
-#             Altered labels
-#         """
-#         np.random.seed(random_state)  # For reproducibility
-#         Y_altered = Y.copy()
-#         classes = np.unique(Y)
-
-#         for classe in classes:
-#             class_indexes = np.where(Y == classe)[0]  # Get indexes of the class
-#             n_to_alter = int(len(class_indexes) * percentual)
-#             chosen_indexes = np.random.choice(class_indexes, n_to_alter, replace=False)
-
-#             # Choose new random labels, different from the original
-#             for idx in chosen_indexes:
-#                 new_classes = np.setdiff1d(classes, Y[idx])  # Avoid the same label
-#                 Y_altered[idx] = np.random.choice(new_classes)
-
-#         return Y_altered
-
-#     X = data.data  # Features
-#     Y_original = data.target  # Labels
-
-#     Y = alterar_rotulos(Y_original, erro_proposto)
-
-#     # Rebuild data_with_error
-#     data_with_error = {"data": data.data, "target": Y, "Y_original": Y_original}
-
-#     return data_with_error
 
 
 if __name__ == "__main__":
