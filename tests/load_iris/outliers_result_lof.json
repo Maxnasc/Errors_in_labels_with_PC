@@ -1,6 +1,6 @@
 {
-    "taxa_de_erro_detectada_corretamente": 0.0,
-    "taxa_de_erro_detectada_erradamente": 0.10666666666666667,
+    "taxa_de_erro_detectada_corretamente": 0.013333333333333334,
+    "taxa_de_erro_detectada_erradamente": 0.09333333333333334,
     "erros_de_rotulo_ajustados_corretamente": 11,
     "taxa_do_erro_ajustada_corretamente": 0.7333333333333333,
     "taxa_do_erro_nao_corrigida": 0.26666666666666666,

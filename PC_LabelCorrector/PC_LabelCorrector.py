@@ -153,32 +153,32 @@ class PC_LabelCorrector:
         scores  = lof.negative_outlier_factor_  # sempre disponível para treino
 
         # --- Plot da malha (grid) ---
-        if X.shape[1] == 2:                     # só faz sentido em 2D
-            # 4) Gera grid “novo” (não visto no fit)
-            xx, yy = np.meshgrid(
-                np.linspace(X[:, 0].min() - 1, X[:, 0].max() + 1, 300),
-                np.linspace(X[:, 1].min() - 1, X[:, 1].max() + 1, 300)
-            )
-            grid = np.c_[xx.ravel(), yy.ravel()]
-            # Usa decision_function no grid
-            Z = lof.decision_function(grid)
-            Z = Z.reshape(xx.shape)
+        # if X.shape[1] == 2:                     # só faz sentido em 2D
+        #     # 4) Gera grid “novo” (não visto no fit)
+        #     xx, yy = np.meshgrid(
+        #         np.linspace(X[:, 0].min() - 1, X[:, 0].max() + 1, 300),
+        #         np.linspace(X[:, 1].min() - 1, X[:, 1].max() + 1, 300)
+        #     )
+        #     grid = np.c_[xx.ravel(), yy.ravel()]
+        #     # Usa decision_function no grid
+        #     Z = lof.decision_function(grid)
+        #     Z = Z.reshape(xx.shape)
 
-            plt.figure(figsize=(8, 6))
-            # Quanto maior Z, mais “normal” é o ponto
-            cs = plt.contourf(xx, yy, Z,
-                            levels=np.linspace(Z.min(), Z.max(), 50),
-                            cmap=plt.cm.RdBu_r)
-            plt.colorbar(cs, label="decision_function")
-            # pinta inliers/outliers do conjunto original
-            plt.scatter(X[:, 0], X[:, 1],
-                        c=y_pred,           # 1 = inlier, -1 = outlier
-                        cmap=plt.cm.coolwarm, edgecolors="k")
-            plt.title("Fronteira de decisão do LOF")
-            plt.xlabel("Feature 1")
-            plt.ylabel("Feature 2")
-            plt.tight_layout()
-            plt.savefig(f'tests/{self.path}/imagens/regiao de decisao LOF.png')
+        #     plt.figure(figsize=(8, 6))
+        #     # Quanto maior Z, mais “normal” é o ponto
+        #     cs = plt.contourf(xx, yy, Z,
+        #                     levels=np.linspace(Z.min(), Z.max(), 50),
+        #                     cmap=plt.cm.RdBu_r)
+        #     plt.colorbar(cs, label="decision_function")
+        #     # pinta inliers/outliers do conjunto original
+        #     plt.scatter(X[:, 0], X[:, 1],
+        #                 c=y_pred,           # 1 = inlier, -1 = outlier
+        #                 cmap=plt.cm.coolwarm, edgecolors="k")
+        #     plt.title("Fronteira de decisão do LOF")
+        #     plt.xlabel("Feature 1")
+        #     plt.ylabel("Feature 2")
+        #     plt.tight_layout()
+        #     plt.savefig(f'tests/{self.path}/imagens/regiao de decisao LOF.png')
             
             # plt.show()
 
@@ -240,23 +240,23 @@ class PC_LabelCorrector:
         for class_label, X in a.items():
             result[class_label]["curve"] = self._get_OneClass_curve(X.get("x_inliers"))
             # Plotar a curva com os dados de inliers e outliers indicados
-            fig, ax = plt.subplots()
-            x_inliers = X.get("x_inliers")
-            x_outliers = X.get("x_outliers")
-            if x_inliers is not None and len(x_inliers) > 0:
-                if x_inliers.ndim == 2 and x_inliers.shape[1] >= 2:
-                    ax.scatter(x_inliers[:, 0], x_inliers[:, 1], marker='o', label='Inliers')
-                else:
-                    ax.scatter(np.arange(len(x_inliers)), x_inliers, marker='o', label='Inliers')
-            if x_outliers is not None and len(x_outliers) > 0:
-                if x_outliers.ndim == 2 and x_outliers.shape[1] >= 2:
-                    ax.scatter(x_outliers[:, 0], x_outliers[:, 1], marker='*', label='Outliers')
-                else:
-                    ax.scatter(np.arange(len(x_outliers)), x_outliers, marker='*', label='Outliers')
-            result[class_label]["curve"].plot_curve(ax)
-            plt.savefig(f'tests/{self.path}/imagens/classe_{class_label}.png')
+        #     fig, ax = plt.subplots()
+        #     x_inliers = X.get("x_inliers")
+        #     x_outliers = X.get("x_outliers")
+        #     if x_inliers is not None and len(x_inliers) > 0:
+        #         if x_inliers.ndim == 2 and x_inliers.shape[1] >= 2:
+        #             ax.scatter(x_inliers[:, 0], x_inliers[:, 1], marker='o', label='Inliers')
+        #         else:
+        #             ax.scatter(np.arange(len(x_inliers)), x_inliers, marker='o', label='Inliers')
+        #     if x_outliers is not None and len(x_outliers) > 0:
+        #         if x_outliers.ndim == 2 and x_outliers.shape[1] >= 2:
+        #             ax.scatter(x_outliers[:, 0], x_outliers[:, 1], marker='*', label='Outliers')
+        #         else:
+        #             ax.scatter(np.arange(len(x_outliers)), x_outliers, marker='*', label='Outliers')
+        #     result[class_label]["curve"].plot_curve(ax)
+        #     plt.savefig(f'tests/{self.path}/imagens/classe_{class_label}.png')
             
-        plt.show()
+        # plt.show()
         return result
 
     def _identify_indexes_to_adjust(self, x_outlier_labeled, X):
