@@ -239,7 +239,7 @@ class PC_LabelCorrector:
         result = x_separated.copy()
         for class_label, X in a.items():
             result[class_label]["curve"] = self._get_OneClass_curve(X.get("x_inliers"))
-            # Plotar a curva com os dados de inliers e outliers indicados
+        #     # Plotar a curva com os dados de inliers e outliers indicados
         #     fig, ax = plt.subplots()
         #     x_inliers = X.get("x_inliers")
         #     x_outliers = X.get("x_outliers")
@@ -407,13 +407,13 @@ class PC_LabelCorrector:
         for classe, valores_classes in self.X_separated.items():
             outliers.extend(valores_classes.get('predict'))
         
-        if self.detect_outlier_with_ocpc:
-            caminho = f'tests/{self.path}/outliers_ocpc.json'
-        else:
-            caminho = f'tests/{self.path}/outliers_lof.json'
+        # if self.detect_outlier_with_ocpc:
+        #     caminho = f'tests/{self.path}/outliers_ocpc.json'
+        # else:
+        #     caminho = f'tests/{self.path}/outliers_lof.json'
             
-        with open(caminho, "w") as f:
-            json.dump([int(o) for o in outliers], f, indent=4)
+        # with open(caminho, "w") as f:
+        #     json.dump([int(o) for o in outliers], f, indent=4)
 
     def run(
         self, X: np.array, Y: np.array, contamination="auto"
