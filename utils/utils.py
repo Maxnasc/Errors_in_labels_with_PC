@@ -70,7 +70,6 @@ def save_metrics_to_csv_file(path: str, metrics: dict):
 
         print(f"Results saved to {path}")
         
-        
 def calcula_novas_metricas(path, outlier_detection_OCPC, Y, data_with_error, Y_adjusted_pc, issues):
     # entender quais labels estão errados
     erros = [i for i, value in enumerate(Y) if value != data_with_error.get('target')[i]]
