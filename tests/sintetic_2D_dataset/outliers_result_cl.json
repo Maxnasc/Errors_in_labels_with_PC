@@ -4,6 +4,6 @@
     "erros_de_rotulo_ajustados_corretamente": 40,
     "taxa_do_erro_ajustada_corretamente": 1.0,
     "taxa_do_erro_nao_corrigida": 0.0,
-    "novos_erros_gerados": 10,
-    "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.024752475247524754
+    "novos_erros_gerados": 11,
+    "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.027227722772277228
 }
