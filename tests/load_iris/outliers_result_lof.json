@@ -1,9 +1,9 @@
 {
     "taxa_de_erro_detectada_corretamente": 0.006666666666666667,
     "taxa_de_erro_detectada_erradamente": 0.1,
-    "erros_de_rotulo_ajustados_corretamente": 12,
-    "taxa_do_erro_ajustada_corretamente": 0.8,
-    "taxa_do_erro_nao_corrigida": 0.2,
+    "erros_de_rotulo_ajustados_corretamente": 13,
+    "taxa_do_erro_ajustada_corretamente": 0.8666666666666667,
+    "taxa_do_erro_nao_corrigida": 0.13333333333333333,
     "novos_erros_gerados": 1,
     "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.006666666666666667
 }

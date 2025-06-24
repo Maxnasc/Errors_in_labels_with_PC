@@ -46,7 +46,7 @@ if __name__=="__main__":
     
     df = pd.concat([df, df_media])
     
-    df.to_excel('resultados_pos_nsga_III.xlsx')
+    df.to_excel('resultados_pos_nsga_IV.xlsx')
 
 
     # Fazer o mesmo para as emissões
