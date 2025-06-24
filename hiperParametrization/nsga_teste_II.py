@@ -140,8 +140,8 @@ def run_nsga2(seed=None):
     random.seed(seed)
     np.random.seed(seed)
 
-    pop_size = 40
-    generations = 20
+    pop_size = 50
+    generations = 30
     cxpb, mutpb = 0.9, 0.1
 
     # 1) Criar população inicial
