@@ -140,7 +140,7 @@ def run_nsga2(seed=None):
     random.seed(seed)
     np.random.seed(seed)
 
-    pop_size = 50
+    pop_size = 100
     generations = 30
     cxpb, mutpb = 0.9, 0.1
 
