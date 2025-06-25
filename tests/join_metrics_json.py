@@ -44,6 +44,10 @@ def get_emission_information(dataset):
     colunas.insert(0, 'dataset')
     
     df_combined = df_combined[colunas]
+    
+    colunas_to_drop = ['timestamp', 'project_name', 'run_id', 'experiment_id', 'emissions', 'emissions_rate', 'cpu_power', 'gpu_power', 'ram_power', 'cpu_energy', 'gpu_energy', 'ram_energy', 'energy_consumed', 'country_name', 'country_iso_code', 'region', 'cloud_provider', 'cloud_region', 'os', 'python_version', 'codecarbon_version', 'cpu_count', 'cpu_model', 'gpu_count', 'gpu_model', 'longitude', 'latitude', 'ram_total_size', 'tracking_mode', 'on_cloud', 'pue']
+
+    df_combined.drop(columns=colunas_to_drop)
 
     return df_combined
 
@@ -57,13 +61,14 @@ if __name__=="__main__":
     df = pd.concat([breast, iris, wine, sintetic_2D_dataset], ignore_index=True)
     
     colunas_para_media = ['taxa_de_erro_detectada_corretamente',	'taxa_de_erro_detectada_erradamente',	'erros_de_rotulo_ajustados_corretamente',	'taxa_do_erro_ajustada_corretamente',	'taxa_do_erro_nao_corrigida',	'novos_erros_gerados',	'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original']
-    media_colunas = df[colunas_para_media].mean()
+    df_filtered = df[df['metodo'] == 'lof']
+    media_colunas = df_filtered[colunas_para_media].mean()
     df_media = pd.DataFrame(media_colunas).T
-    df_media.index = ['Média']
+    df_media.index = ['Média dos resultados LOF']
     
     df = pd.concat([df, df_media])
     
-    df.to_excel('resultados_pos_nsga_V.xlsx')
+    df.to_excel('resultados_pos_nsga_VII.xlsx')
 
     e_breast = get_emission_information('breast_cancer')
     e_iris = get_emission_information('load_iris')
@@ -72,13 +77,13 @@ if __name__=="__main__":
     
     df = pd.concat([e_breast, e_iris, e_wine, e_sintetic_2D_dataset], ignore_index=True)
     
-    colunas_para_media = ['taxa_de_erro_detectada_corretamente',	'taxa_de_erro_detectada_erradamente',	'erros_de_rotulo_ajustados_corretamente',	'taxa_do_erro_ajustada_corretamente',	'taxa_do_erro_nao_corrigida',	'novos_erros_gerados',	'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original']
+    colunas_para_media = ['duration']
     media_colunas = df[colunas_para_media].mean()
     df_media = pd.DataFrame(media_colunas).T
     df_media.index = ['Média']
     
     df = pd.concat([df, df_media])
     
-    df.to_excel('resultados_pos_nsga_V.xlsx')
+    df.to_excel('emissoes_pos_nsga_VII.xlsx')
     
     # Fazer o mesmo para as emissões

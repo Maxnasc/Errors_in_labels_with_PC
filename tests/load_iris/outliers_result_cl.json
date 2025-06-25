@@ -1,9 +1,9 @@
 {
-    "taxa_de_erro_detectada_corretamente": 0.006666666666666667,
-    "taxa_de_erro_detectada_erradamente": 0.09333333333333334,
-    "erros_de_rotulo_ajustados_corretamente": 14,
-    "taxa_do_erro_ajustada_corretamente": 0.9333333333333333,
-    "taxa_do_erro_nao_corrigida": 0.06666666666666667,
-    "novos_erros_gerados": 7,
-    "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.04666666666666667
+    "taxa_de_erro_detectada_corretamente": 0.013333333333333334,
+    "taxa_de_erro_detectada_erradamente": 0.08666666666666667,
+    "erros_de_rotulo_ajustados_corretamente": 15,
+    "taxa_do_erro_ajustada_corretamente": 1.0,
+    "taxa_do_erro_nao_corrigida": 0.0,
+    "novos_erros_gerados": 4,
+    "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.02666666666666667
 }
