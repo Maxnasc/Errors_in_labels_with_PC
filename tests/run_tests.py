@@ -256,7 +256,7 @@ def get_metrics_from_two_outlier_detection_method(n_samples: int):
     # Salva como Excel
     df.to_excel('tests/global_metrics.xlsx', index=False)
     
-    get_emmisions_metric()
+    # get_emmisions_metric()
 
 def get_emmisions_metric():
     paths = 'tests/breast_cancer/codecarbon_emissions'
