@@ -1,12 +1,12 @@
 {
     "ocpc": {
-        "taxa_de_erro_detectada_corretamente": 0.012376237623762377,
-        "taxa_de_erro_detectada_erradamente": 0.06435643564356436,
-        "erros_de_rotulo_ajustados_corretamente": 15,
-        "taxa_do_erro_ajustada_corretamente": 0.375,
-        "taxa_do_erro_nao_corrigida": 0.625,
-        "novos_erros_gerados": 8,
-        "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.019801980198019802
+        "taxa_de_erro_detectada_corretamente": 0.007425742574257425,
+        "taxa_de_erro_detectada_erradamente": 0.06930693069306931,
+        "erros_de_rotulo_ajustados_corretamente": 20,
+        "taxa_do_erro_ajustada_corretamente": 0.5,
+        "taxa_do_erro_nao_corrigida": 0.5,
+        "novos_erros_gerados": 12,
+        "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.0297029702970297
     },
     "CL": {
         "taxa_de_erro_detectada_corretamente": "correct_outliers_detected_CL.shape[0] / len(Y)",
