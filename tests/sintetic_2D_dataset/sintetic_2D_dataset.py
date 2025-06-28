@@ -106,12 +106,13 @@ def test_2D_sintetic_dataset(path = 'sintetic_2D_dataset', k_max = int, alfa = f
     )
 
     # Executando e rastreando emissões do Confident Learning
-    cl_issues, issues = run_confident_learning(
-        data_with_error["data"],
-        data_with_error["target"],
-        Y,
-        f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
-    )
+    # cl_issues, issues = run_confident_learning(
+    #     data_with_error["data"],
+    #     data_with_error["target"],
+    #     Y,
+    #     f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+    # )
+    cl_issues, issues = [], pd.DataFrame()
     
     # # entender quais labels estão errados
     # erros = [i for i, value in enumerate(Y) if value != data_with_error.get('target')[i]]
