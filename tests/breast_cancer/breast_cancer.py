@@ -42,13 +42,13 @@ def test_breast_cancer_dataset(path='breast_cancer', k_max = int, alfa = float, 
     )
 
     # Executando e rastreando emissões do Confident Learning
-    #cl_issues, issues = run_confident_learning(
-    #        data_with_error["data"],
-    #        data_with_error["target"],
-    #        data.get('target'),
-    #        f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else #'LOF'}"
-    #    )
-    cl_issues, issues = [], pd.DataFrame()
+    cl_issues, issues = run_confident_learning(
+           data_with_error["data"],
+           data_with_error["target"],
+           data.get('target'),
+           f"CL_2D_sintetic_{'OCPC' if outlier_detection_OCPC else 'LOF'}"
+       )
+    # cl_issues, issues = [], pd.DataFrame()
     
     resultado_outliers_ocpc, resultado_outliers_CL = calcula_novas_metricas(path=path, outlier_detection_OCPC=outlier_detection_OCPC, Y=data.target, data_with_error=data_with_error, Y_adjusted_pc=Y_adjusted_pc, issues=issues)
 

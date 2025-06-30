@@ -97,18 +97,18 @@ def calcula_novas_metricas(path, outlier_detection_OCPC, Y, data_with_error, Y_a
     novos_erros_gerados = [i for i in erros_depois_de_corrigir if i not in erros]  
 
     # Cálculos para resultado_outliers_CL, espelhando a lógica do OCPC
-    # issues['erro_original'] = issues['original_labels'] != data_with_error.get('target')
-    # issues['erro_apos_correcao'] = issues['original_labels'] != issues['predicted_label']
+    issues['erro_original'] = issues['original_labels'] != data_with_error.get('target')
+    issues['erro_apos_correcao'] = issues['original_labels'] != issues['predicted_label']
 
-    # erros_indices_CL = issues[issues['erro_original']].index.tolist()
-    # erros_depois_corrigir_indices_CL = issues[issues['erro_apos_correcao']].index.tolist()
+    erros_indices_CL = issues[issues['erro_original']].index.tolist()
+    erros_depois_corrigir_indices_CL = issues[issues['erro_apos_correcao']].index.tolist()
 
-    # erros_ajustados_corretamente_CL = [i for i in erros_indices_CL if i not in erros_depois_corrigir_indices_CL]
-    # erros_nao_corrigidos_CL = [i for i in erros_indices_CL if i in erros_depois_corrigir_indices_CL]
-    # novos_erros_gerados_CL = [i for i in erros_depois_corrigir_indices_CL if i not in erros_indices_CL]
+    erros_ajustados_corretamente_CL = [i for i in erros_indices_CL if i not in erros_depois_corrigir_indices_CL]
+    erros_nao_corrigidos_CL = [i for i in erros_indices_CL if i in erros_depois_corrigir_indices_CL]
+    novos_erros_gerados_CL = [i for i in erros_depois_corrigir_indices_CL if i not in erros_indices_CL]
 
-    # correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label'] == issues['original_labels'])]
-    # wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label'] != issues['original_labels'])]
+    correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label'] == issues['original_labels'])]
+    wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label'] != issues['original_labels'])]
     
     resultado_outliers_ocpc = {
         'taxa_de_erro_detectada_corretamente': len(correct_detected_outliers)/len(Y),
@@ -121,13 +121,13 @@ def calcula_novas_metricas(path, outlier_detection_OCPC, Y, data_with_error, Y_a
     }
     
     resultado_outliers_CL = {
-        'taxa_de_erro_detectada_corretamente': 'correct_outliers_detected_CL.shape[0] / len(Y)',
-        'taxa_de_erro_detectada_erradamente': 'wrong_false_alarm_CL.shape[0] / len(Y)',
-        'erros_de_rotulo_ajustados_corretamente': 'len(erros_ajustados_corretamente_CL)',
-        'taxa_do_erro_ajustada_corretamente': 'len(erros_ajustados_corretamente_CL) / len(erros_indices_CL) if erros_indices_CL else 0',
-        'taxa_do_erro_nao_corrigida': 'len(erros_nao_corrigidos_CL) / len(erros_indices_CL) if erros_indices_CL else 0',
-        'novos_erros_gerados': 'len(novos_erros_gerados_CL) if erros_indices_CL else 0',
-        'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': 'len(novos_erros_gerados_CL) / len(Y) if erros_indices_CL else 0',
+        'taxa_de_erro_detectada_corretamente': correct_outliers_detected_CL.shape[0] / len(Y),
+        'taxa_de_erro_detectada_erradamente': wrong_false_alarm_CL.shape[0] / len(Y),
+        'erros_de_rotulo_ajustados_corretamente': len(erros_ajustados_corretamente_CL),
+        'taxa_do_erro_ajustada_corretamente': len(erros_ajustados_corretamente_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
+        'taxa_do_erro_nao_corrigida': len(erros_nao_corrigidos_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
+        'novos_erros_gerados': len(novos_erros_gerados_CL) if erros_indices_CL else 0,
+        'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': len(novos_erros_gerados_CL) / len(Y) if erros_indices_CL else 0,
     }
         
     with open(caminho_ocpc, "w") as f:

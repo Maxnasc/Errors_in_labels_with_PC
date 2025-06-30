@@ -248,20 +248,47 @@ if __name__ == "__main__":
         df_best.to_csv("hiperParametrization/best-subject.csv", index=False)
         print("✅ Melhor indivíduo salvo em 'hiperParametrization/best-subject.csv'.")
 
-        # 7. (Opcional) Plotar Pareto (obj1 × obj5)
+        # 7. Plotar Pareto em 2D (obj1 × obj5)
+    if not df_results.empty:
         plt.figure(figsize=(8, 6))
-        # No plot, obj1_cdor ainda é apresentado como é (para visualização da frente de Pareto real)
         plt.scatter(df_results['obj1_cdor'],
                     df_results['obj5_time'],
                     alpha=0.6,
-                    label='Fronteira de Pareto (obj1 × obj5)')
-        plt.title("Pareto (avg_cdor vs Tempo total)")
-        plt.xlabel("avg_cdor (a maximizar)") # Rótulo ajustado para refletir o objetivo
+                    label='Fronteira de Pareto (avg_cdor vs Tempo total)')
+        plt.title("Pareto 2D (avg_cdor vs Tempo total)")
+        plt.xlabel("avg_cdor (a maximizar)")
         plt.ylabel("Tempo total (s) (a minimizar)")
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
-        plt.savefig("hiperParametrization/pareto_3objetivos.png") # Salva o plot no diretório correto
+        plt.savefig("hiperParametrization/pareto_cdor_time_2D.png") # Nome do arquivo ajustado
+        plt.show()
+
+        # 8. Plotar Pareto em 3D (obj1 × obj3 × obj5)
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111, projection='3d')
+
+        ax.scatter(df_results['obj1_cdor'],
+                   df_results['obj3_caer'],
+                   df_results['obj5_time'],
+                   c='blue',
+                   marker='o',
+                   alpha=0.7) # Aumentei um pouco o alpha para melhor visualização
+
+        ax.set_xlabel("avg_cdor (Maximizar)", labelpad=10) # labelpad para afastar um pouco o rótulo
+        ax.set_ylabel("avg_caer (Minimizar)", labelpad=10)
+        ax.set_zlabel("Tempo total (s) (Minimizar)", labelpad=10)
+        ax.set_title("Fronteira de Pareto 3D")
+
+        # Ajustes para os ticks (opcional, para melhor leitura dos eixos)
+        # Se os ranges forem muito pequenos, pode não ser necessário
+        # from matplotlib.ticker import FormatStrFormatter
+        # ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        # ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        # ax.zaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+
+        plt.tight_layout() # Garante que os rótulos não se sobreponham
+        plt.savefig("hiperParametrization/pareto_3objetivos_3D.png")
         plt.show()
     else:
         print("⚠️ Não há resultados de Pareto para salvar ou plotar.")

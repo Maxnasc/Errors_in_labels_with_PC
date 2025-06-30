@@ -68,7 +68,7 @@ if __name__=="__main__":
     
     df = pd.concat([df, df_media])
     
-    df.to_excel('resultados_pos_nsga_VII.xlsx')
+    df.to_excel('resultados_pos_nsga_VIII.xlsx')
 
     e_breast = get_emission_information('breast_cancer')
     e_iris = get_emission_information('load_iris')
@@ -84,6 +84,6 @@ if __name__=="__main__":
     
     df = pd.concat([df, df_media])
     
-    df.to_excel('emissoes_pos_nsga_VII.xlsx')
+    df.to_excel('emissoes_pos_nsga_VIII.xlsx')
     
     # Fazer o mesmo para as emissões
