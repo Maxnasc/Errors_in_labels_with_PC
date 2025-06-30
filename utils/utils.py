@@ -120,14 +120,24 @@ def calcula_novas_metricas(path, outlier_detection_OCPC, Y, data_with_error, Y_a
         'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': len(novos_erros_gerados)/len(Y),
     }
     
+    # resultado_outliers_CL = {
+    #     'taxa_de_erro_detectada_corretamente': correct_outliers_detected_CL.shape[0] / len(Y),
+    #     'taxa_de_erro_detectada_erradamente': wrong_false_alarm_CL.shape[0] / len(Y),
+    #     'erros_de_rotulo_ajustados_corretamente': len(erros_ajustados_corretamente_CL),
+    #     'taxa_do_erro_ajustada_corretamente': len(erros_ajustados_corretamente_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
+    #     'taxa_do_erro_nao_corrigida': len(erros_nao_corrigidos_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
+    #     'novos_erros_gerados': len(novos_erros_gerados_CL) if erros_indices_CL else 0,
+    #     'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': len(novos_erros_gerados_CL) / len(Y) if erros_indices_CL else 0,
+    # }
+    
     resultado_outliers_CL = {
-        'taxa_de_erro_detectada_corretamente': correct_outliers_detected_CL.shape[0] / len(Y),
-        'taxa_de_erro_detectada_erradamente': wrong_false_alarm_CL.shape[0] / len(Y),
-        'erros_de_rotulo_ajustados_corretamente': len(erros_ajustados_corretamente_CL),
-        'taxa_do_erro_ajustada_corretamente': len(erros_ajustados_corretamente_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
-        'taxa_do_erro_nao_corrigida': len(erros_nao_corrigidos_CL) / len(erros_indices_CL) if erros_indices_CL else 0,
-        'novos_erros_gerados': len(novos_erros_gerados_CL) if erros_indices_CL else 0,
-        'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': len(novos_erros_gerados_CL) / len(Y) if erros_indices_CL else 0,
+        'taxa_de_erro_detectada_corretamente': 0,
+        'taxa_de_erro_detectada_erradamente': 0,
+        'erros_de_rotulo_ajustados_corretamente': 0,
+        'taxa_do_erro_ajustada_corretamente': 0,
+        'taxa_do_erro_nao_corrigida': 0,
+        'novos_erros_gerados': 0,
+        'taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original': 0,
     }
         
     with open(caminho_ocpc, "w") as f:
