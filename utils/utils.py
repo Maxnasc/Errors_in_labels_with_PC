@@ -96,19 +96,19 @@ def calcula_novas_metricas(path, outlier_detection_OCPC, Y, data_with_error, Y_a
     erros_nao_corrigidos = [i for i in erros if i in erros_depois_de_corrigir]
     novos_erros_gerados = [i for i in erros_depois_de_corrigir if i not in erros]  
 
-    # Cálculos para resultado_outliers_CL, espelhando a lógica do OCPC
-    issues['erro_original'] = issues['original_labels'] != data_with_error.get('target')
-    issues['erro_apos_correcao'] = issues['original_labels'] != issues['predicted_label']
+    # # Cálculos para resultado_outliers_CL, espelhando a lógica do OCPC
+    # issues['erro_original'] = issues['original_labels'] != data_with_error.get('target')
+    # issues['erro_apos_correcao'] = issues['original_labels'] != issues['predicted_label']
 
-    erros_indices_CL = issues[issues['erro_original']].index.tolist()
-    erros_depois_corrigir_indices_CL = issues[issues['erro_apos_correcao']].index.tolist()
+    # erros_indices_CL = issues[issues['erro_original']].index.tolist()
+    # erros_depois_corrigir_indices_CL = issues[issues['erro_apos_correcao']].index.tolist()
 
-    erros_ajustados_corretamente_CL = [i for i in erros_indices_CL if i not in erros_depois_corrigir_indices_CL]
-    erros_nao_corrigidos_CL = [i for i in erros_indices_CL if i in erros_depois_corrigir_indices_CL]
-    novos_erros_gerados_CL = [i for i in erros_depois_corrigir_indices_CL if i not in erros_indices_CL]
+    # erros_ajustados_corretamente_CL = [i for i in erros_indices_CL if i not in erros_depois_corrigir_indices_CL]
+    # erros_nao_corrigidos_CL = [i for i in erros_indices_CL if i in erros_depois_corrigir_indices_CL]
+    # novos_erros_gerados_CL = [i for i in erros_depois_corrigir_indices_CL if i not in erros_indices_CL]
 
-    correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label'] == issues['original_labels'])]
-    wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label'] != issues['original_labels'])]
+    # correct_outliers_detected_CL = issues[issues['is_label_issue'] & (issues['given_label'] == issues['original_labels'])]
+    # wrong_false_alarm_CL = issues[issues['is_label_issue'] & (issues['given_label'] != issues['original_labels'])]
     
     resultado_outliers_ocpc = {
         'taxa_de_erro_detectada_corretamente': len(correct_detected_outliers)/len(Y),

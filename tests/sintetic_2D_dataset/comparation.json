@@ -1,20 +1,20 @@
 {
     "ocpc": {
-        "taxa_de_erro_detectada_corretamente": 0.01485148514851485,
-        "taxa_de_erro_detectada_erradamente": 0.07425742574257425,
-        "erros_de_rotulo_ajustados_corretamente": 33,
-        "taxa_do_erro_ajustada_corretamente": 0.825,
-        "taxa_do_erro_nao_corrigida": 0.175,
+        "taxa_de_erro_detectada_corretamente": 0.007425742574257425,
+        "taxa_de_erro_detectada_erradamente": 0.06930693069306931,
+        "erros_de_rotulo_ajustados_corretamente": 31,
+        "taxa_do_erro_ajustada_corretamente": 0.775,
+        "taxa_do_erro_nao_corrigida": 0.225,
         "novos_erros_gerados": 0,
         "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.0
     },
     "CL": {
-        "taxa_de_erro_detectada_corretamente": 0.0,
-        "taxa_de_erro_detectada_erradamente": 0.0891089108910891,
-        "erros_de_rotulo_ajustados_corretamente": 38,
-        "taxa_do_erro_ajustada_corretamente": 0.95,
-        "taxa_do_erro_nao_corrigida": 0.05,
-        "novos_erros_gerados": 13,
-        "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0.03217821782178218
+        "taxa_de_erro_detectada_corretamente": 0,
+        "taxa_de_erro_detectada_erradamente": 0,
+        "erros_de_rotulo_ajustados_corretamente": 0,
+        "taxa_do_erro_ajustada_corretamente": 0,
+        "taxa_do_erro_nao_corrigida": 0,
+        "novos_erros_gerados": 0,
+        "taxa_de_erro_novos_erros_gerados_com_relacao_ao_dataset_original": 0
     }
 }
